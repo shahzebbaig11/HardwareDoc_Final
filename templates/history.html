@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Diagnosis History{% endblock %}
+
+{% block content %}
+<div class="page-inner">
+  <div class="page-header">
+    <h1 class="page-title">Diagnosis History</h1>
+    <p class="page-subtitle">All completed diagnostic sessions are saved here and persist across application restarts.</p>
+  </div>
+
+  {% if sessions %}
+  <div class="history-toolbar">
+    <span class="history-count">{{ sessions | length }} session{% if sessions | length != 1 %}s{% endif %} saved</span>
+    <button class="btn btn-danger btn-sm" id="clear-history-btn" onclick="document.getElementById('clear-confirm').hidden = !document.getElementById('clear-confirm').hidden">
+      🗑 Clear All
+    </button>
+  </div>
+
+  <!-- Clear all confirmation -->
+  <div class="confirm-dialog" id="clear-confirm" hidden role="alertdialog" aria-modal="true" aria-labelledby="clear-confirm-title">
+    <p id="clear-confirm-title">Are you sure you want to delete <strong>all {{ sessions | length }} records</strong>? This cannot be undone.</p>
+    <div class="confirm-actions">
+      <form method="POST" action="{{ url_for('history_clear') }}">
+        <input type="hidden" name="confirm" value="yes" />
+        <button type="submit" class="btn btn-danger btn-sm" id="confirm-clear-btn">Yes, Delete All</button>
+      </form>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('clear-confirm').hidden=true" id="cancel-clear-btn">Cancel</button>
+    </div>
+  </div>
+
+  <div class="history-grid" role="list">
+    {% for s in sessions %}
+    <article class="history-card" role="listitem" id="history-card-{{ s.session_id[:8] }}">
+      <div class="history-card-header">
+        <span class="history-status-badge status-{{ s.confidence }}">
+          {% if s.confidence == 'confirmed' %}✓ Confirmed
+          {% elif s.confidence == 'suspected' %}⚠ Suspected
+          {% else %}◌ Insufficient Evidence{% endif %}
+        </span>
+        <span class="history-date">{{ s.created_at | replace('T', ' ') }}</span>
+      </div>
+      <h2 class="history-goal">{{ s.goal_label }}</h2>
+      <div class="history-conclusion">
+        <strong>{{ s.conclusion_label }}</strong>
+      </div>
+      <div class="history-meta">
+        <span>{{ s.questions_asked }} question{% if s.questions_asked != 1 %}s{% endif %} asked</span>
+      </div>
+      <div class="history-actions">
+        <a href="{{ url_for('history_detail', session_id=s.session_id) }}" class="btn btn-secondary btn-sm" id="view-{{ s.session_id[:8] }}">
+          View Details →
+        </a>
+        <button class="btn btn-ghost btn-sm delete-btn"
+                data-session-id="{{ s.session_id }}"
+                data-session-short="{{ s.session_id[:8] }}"
+                id="delete-{{ s.session_id[:8] }}"
+                type="button"
+                onclick="confirmDelete('{{ s.session_id }}', '{{ s.session_id[:8] }}')">
+          🗑 Delete
+        </button>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+
+  <!-- Delete confirmation (hidden form) -->
+  <form method="POST" id="delete-form" style="display:none">
+    <input type="hidden" name="_method" value="POST" />
+  </form>
+
+  {% else %}
+  <div class="empty-state" role="status">
+    <div class="empty-icon" aria-hidden="true">📋</div>
+    <h2 class="empty-title">No Diagnosis History</h2>
+    <p class="empty-desc">
+      Completed diagnoses will appear here. Once you finish a diagnosis session,
+      it is automatically saved to persistent storage.
+    </p>
+    <a href="{{ url_for('diagnosis_new') }}" class="btn btn-primary" id="start-first-diag-btn">
+      🔍 Start Your First Diagnosis
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function confirmDelete(sessionId, shortId) {
+  if (confirm('Delete diagnosis record ' + shortId + '...? This cannot be undone.')) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/history/' + sessionId + '/delete';
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+</script>
+{% endblock %}

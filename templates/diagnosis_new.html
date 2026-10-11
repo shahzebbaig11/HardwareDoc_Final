@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}New Diagnosis{% endblock %}
+
+{% block content %}
+<div class="page-inner">
+  <div class="page-header">
+    <h1 class="page-title">New Diagnosis</h1>
+    <p class="page-subtitle">Select the category that best describes your hardware problem to begin a targeted diagnosis session.</p>
+  </div>
+
+  <div class="goals-select-grid" id="goal-selection">
+    {% for goal in goals %}
+    <div class="goal-select-card" id="goal-{{ goal.id }}">
+      <div class="goal-select-header">
+        <span class="goal-select-icon" aria-hidden="true">{{ goal.icon }}</span>
+        <h2 class="goal-select-title">{{ goal.label }}</h2>
+      </div>
+      <p class="goal-select-desc">{{ goal.description }}</p>
+      <div class="goal-select-meta">
+        <span class="goal-meta-item">
+          <span aria-hidden="true">📏</span>
+          {{ goal.target_conclusions | length }} possible conclusions
+        </span>
+      </div>
+      <form method="POST" action="{{ url_for('diagnosis_start') }}" class="goal-select-form">
+        <input type="hidden" name="goal_id" value="{{ goal.id }}" />
+        <button type="submit" class="btn btn-primary goal-start-btn" id="start-btn-{{ goal.id }}">
+          Start Diagnosis →
+        </button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="info-box" role="note">
+    <div class="info-box-icon" aria-hidden="true">💡</div>
+    <div>
+      <strong>How the engine works:</strong> Once you select a category, the backward-chaining
+      engine identifies which rules could establish a fault in that category. It then asks only
+      the questions whose answers are needed to prove or disprove those rules. You can click
+      <em>Why is this being asked?</em> next to any question to understand the reasoning.
+    </div>
+  </div>
+</div>
+{% endblock %}

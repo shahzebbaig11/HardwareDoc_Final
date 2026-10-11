@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block title %}About Project{% endblock %}
+
+{% block content %}
+<div class="page-inner">
+  <div class="page-header">
+    <h1 class="page-title">About This Project</h1>
+    <p class="page-subtitle">
+      Expert System for Computer Hardware Fault Diagnosis Using Backward Chaining,
+      with WHY and HOW Explanation Facilities
+    </p>
+  </div>
+
+  <div class="about-grid">
+
+    <!-- ── What Problem Does This Solve ──────────────────── -->
+    <section class="about-card full-width" id="about-objective" aria-labelledby="about-obj-h">
+      <h2 id="about-obj-h" class="about-card-title">What Problem Does This Solve?</h2>
+      <p>
+        When a computer stops working, diagnosing the cause requires methodical reasoning.
+        A user without technical knowledge may not know which component to check first, which
+        symptoms are significant, or which questions to ask themselves.
+      </p>
+      <p>
+        This application is a <strong>rule-based expert system</strong> that captures the
+        reasoning process of a hardware technician in the form of structured IF-THEN rules.
+        It interviews the user with only relevant questions, reasons through those rules, and
+        produces a traceable, explainable diagnosis — without requiring any technical expertise
+        from the user.
+      </p>
+      <p>
+        It is a <strong>BCA Mini-Project</strong> demonstrating the practical implementation
+        of backward-chaining inference — a fundamental concept in Artificial Intelligence and
+        Knowledge-Based Systems.
+      </p>
+    </section>
+
+    <!-- ── Backward Chaining Explained ──────────────────── -->
+    <section class="about-card" id="about-bc" aria-labelledby="about-bc-h">
+      <h2 id="about-bc-h" class="about-card-title">How Backward Chaining Works</h2>
+      <p>
+        <strong>Backward chaining</strong> is a goal-driven inference strategy. Instead of
+        applying all known facts to derive every possible conclusion (forward chaining), the
+        engine starts from a <em>hypothesis</em> — a specific fault — and works backward to
+        find facts that would prove it.
+      </p>
+      <ol class="about-list">
+        <li>Select a <strong>goal</strong> (a specific fault to investigate, e.g. "no power").</li>
+        <li>Find all <strong>IF-THEN rules</strong> whose THEN part matches the goal.</li>
+        <li>For each rule, try to prove all IF premises.</li>
+        <li>If a premise is already in working memory (a previous answer), use it directly.</li>
+        <li>If a premise is unknown, check if another rule can prove it (recursive step).</li>
+        <li>If no rule can prove it, <strong>ask the user</strong> a question.</li>
+        <li>If all premises of a rule are proved, the <strong>goal is established</strong>.</li>
+        <li>If a premise is disproved, try the next alternative rule (backtracking).</li>
+        <li>If no rule succeeds, the system reports <em>insufficient evidence</em>.</li>
+      </ol>
+      <p>
+        This approach means the system <strong>only asks questions relevant to the current
+        hypothesis</strong>, and stops the moment a conclusion is proved or all possibilities
+        are exhausted.
+      </p>
+    </section>
+
+    <!-- ── Worked Example ────────────────────────────────── -->
+    <section class="about-card" id="about-example" aria-labelledby="about-ex-h">
+      <h2 id="about-ex-h" class="about-card-title">A Concrete Example</h2>
+      <p>Suppose the user selects the goal <strong>"No Power"</strong>. The engine has this rule:</p>
+      <div class="bc-diagram" style="margin:12px 0">
+        <div class="bc-step">
+          <span class="bc-label">Rule R01</span>
+          <span class="bc-code">IF no_power_sign AND power_cable_disconnected<br>THEN fault_power_cable_disconnected (confirmed)</span>
+        </div>
+        <div class="bc-connector">↓ engine tries to prove both premises</div>
+        <div class="bc-step">
+          <span class="bc-label">Premise 1</span>
+          <span class="bc-code">no_power_sign — asks: "Does the computer show any sign of power?"<br>User answers: <strong>No</strong> → no_power_sign = TRUE</span>
+        </div>
+        <div class="bc-connector">↓</div>
+        <div class="bc-step">
+          <span class="bc-label">Premise 2</span>
+          <span class="bc-code">power_cable_disconnected — asks: "Is the main power cable disconnected?"<br>User answers: <strong>Yes</strong> → power_cable_disconnected = TRUE</span>
+        </div>
+        <div class="bc-connector">↓ both premises proved</div>
+        <div class="bc-step bc-step-result">
+          <span class="bc-label">Conclusion</span>
+          <span class="bc-code">fault_power_cable_disconnected — CONFIRMED ✓</span>
+        </div>
+      </div>
+      <p>
+        If the user had answered "No" to the cable question, the engine would backtrack,
+        try the next rule (e.g. faulty PSU), and ask further questions only relevant to that rule.
+      </p>
+    </section>
+
+    <!-- ── WHY Explanation ───────────────────────────────── -->
+    <section class="about-card" id="about-why" aria-labelledby="about-why-h">
+      <h2 id="about-why-h" class="about-card-title">WHY Explanation Facility</h2>
+      <p>
+        During diagnosis, every question has a <strong>"Why is this being asked?"</strong> button.
+        Clicking it reveals:
+      </p>
+      <ul class="about-list">
+        <li>Which <strong>diagnostic goal</strong> is currently under investigation.</li>
+        <li>Which <strong>rule</strong> requires this fact as a premise, and what it would prove.</li>
+        <li>The <strong>question's own explanation</strong> — why this symptom matters clinically.</li>
+        <li>Which <strong>facts have already been established</strong> in this session.</li>
+      </ul>
+      <p>
+        The WHY explanation is generated in real time from the live inference state — it is not
+        pre-written. Different answers to earlier questions lead to different WHY responses for
+        later questions.
+      </p>
+      <p>
+        <em>Example:</em> "Is the PSU fan spinning?" is asked because the engine is currently
+        trying to prove Rule R03 (PSU suspected fault), which requires the fact
+        <code>psu_fan_not_spinning</code> as one of its premises.
+      </p>
+    </section>
+
+    <!-- ── HOW Explanation ───────────────────────────────── -->
+    <section class="about-card" id="about-how" aria-labelledby="about-how-h">
+      <h2 id="about-how-h" class="about-card-title">HOW Explanation Facility</h2>
+      <p>
+        After a diagnosis is complete, the <strong>"How was this concluded?"</strong> link
+        shows the complete reasoning trace:
+      </p>
+      <ul class="about-list">
+        <li>The diagnostic goal and the final conclusion.</li>
+        <li>A numbered sequence of every inference step taken.</li>
+        <li>Which rules <strong>fired</strong> (all premises proved) and which failed (and why).</li>
+        <li>Each premise's fact ID, the question asked, and the answer recorded.</li>
+        <li>Which rules were skipped because an earlier premise was already disproved.</li>
+      </ul>
+      <p>
+        The HOW explanation <strong>never invents rule firings</strong>. Only steps that
+        actually happened during the engine's execution are shown. If a rule failed, it is
+        listed as "not applicable" with the reason.
+      </p>
+    </section>
+
+    <!-- ── How Answers Affect Reasoning ─────────────────── -->
+    <section class="about-card" id="about-answers" aria-labelledby="about-ans-h">
+      <h2 id="about-ans-h" class="about-card-title">How Answers Affect Reasoning</h2>
+      <ul class="about-list">
+        <li>
+          <strong>Yes</strong> — sets the corresponding fact to TRUE in working memory.
+          Any rule that requires this fact as a positive premise can now fire (if other premises are also met).
+        </li>
+        <li>
+          <strong>No</strong> — sets the fact to FALSE. Rules that require it as a positive premise
+          are immediately eliminated. The engine backtracks and tries the next alternative rule.
+        </li>
+        <li>
+          <strong>Unknown</strong> — records the fact as UNKNOWN. The engine does not treat unknown
+          as No. It may still ask further questions to try alternative rules that do not require this
+          fact. If no conclusion can be reached, it reports insufficient evidence rather than guessing.
+        </li>
+      </ul>
+    </section>
+
+    <!-- ── Limitations ───────────────────────────────────── -->
+    <section class="about-card" id="about-limits" aria-labelledby="about-limits-h">
+      <h2 id="about-limits-h" class="about-card-title">System Limitations</h2>
+      <ul class="about-list">
+        <li>The system only covers faults explicitly encoded in its {{ rules | length }} rules. Unknown faults are reported as "insufficient evidence".</li>
+        <li>Diagnosis is based on observable symptoms described by the user — hardware that requires physical testing (e.g., multimeter readings) cannot be fully diagnosed here.</li>
+        <li>The system assumes the user's observations are accurate. Incorrect answers lead to incorrect diagnoses.</li>
+        <li>It is designed for <strong>educational use only</strong>. It is not a substitute for a qualified hardware technician.</li>
+        <li>Never open or attempt to repair a power supply unit — it contains dangerous voltages even when unplugged.</li>
+      </ul>
+    </section>
+
+    <!-- ── Safety ────────────────────────────────────────── -->
+    <section class="about-card" id="about-safety" aria-labelledby="about-safety-h">
+      <h2 id="about-safety-h" class="about-card-title">⚠ Safety &amp; Disclaimer</h2>
+      <p>
+        This application is designed for <strong>educational use only</strong>.
+        All diagnoses produced are based on rule-based reasoning from limited observable symptoms
+        and are not a substitute for professional hardware testing or repair.
+      </p>
+      <ul class="about-list">
+        <li>Always consult a qualified computer technician for hardware repairs.</li>
+        <li>Never open or attempt to repair a power supply unit — it contains dangerous voltages.</li>
+        <li>Do not touch exposed components inside a computer while it is powered on.</li>
+        <li>Handle RAM, CPUs, and other components with proper anti-static precautions.</li>
+      </ul>
+    </section>
+
+  </div>
+</div>
+{% endblock %}

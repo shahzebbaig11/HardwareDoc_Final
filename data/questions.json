@@ -1,0 +1,525 @@
+{
+  "questions": [
+    {
+      "id": "Q01",
+      "fact_id": "no_power_sign",
+      "text": "Does the computer show any sign of power when you press the power button? (e.g., fans spinning, lights turning on, any sound)",
+      "text_negative": "no_power_sign",
+      "text_positive": "computer_powers_on",
+      "why_explanation": "This is the most fundamental check. If there is absolutely no sign of power, we investigate power supply issues. If there is some power, we focus on display or other hardware problems.",
+      "applicable_goals": [
+        "fault_power_cable_disconnected",
+        "fault_power_button",
+        "fault_psu_suspected",
+        "fault_motherboard_or_psu",
+        "fault_monitor_off",
+        "fault_display_cable_disconnected",
+        "fault_gpu_suspected",
+        "fault_ram_seating_no_display"
+      ],
+      "answer_yes_sets": [
+        "computer_powers_on"
+      ],
+      "answer_no_sets": [
+        "no_power_sign"
+      ]
+    },
+    {
+      "id": "Q02",
+      "fact_id": "power_cable_disconnected",
+      "text": "Is the main power cable disconnected from either the power supply unit or the wall outlet?",
+      "why_explanation": "A disconnected power cable is the simplest reason a computer won't turn on. We need to check this before investigating more complex hardware faults.",
+      "applicable_goals": [
+        "fault_power_cable_disconnected"
+      ],
+      "answer_yes_sets": [
+        "power_cable_disconnected"
+      ],
+      "answer_no_sets": [
+        "power_cable_connected"
+      ]
+    },
+    {
+      "id": "Q03",
+      "fact_id": "power_button_faulty",
+      "text": "Does the power button feel stuck, broken, or unresponsive when pressed?",
+      "why_explanation": "A faulty power button can prevent the computer from starting even if all other components are working correctly.",
+      "applicable_goals": [
+        "fault_power_button"
+      ],
+      "answer_yes_sets": [
+        "power_button_faulty"
+      ],
+      "answer_no_sets": []
+    },
+    {
+      "id": "Q04",
+      "fact_id": "psu_fan_spinning",
+      "text": "When you press the power button, can you hear or see the power supply unit (PSU) fan spinning at all?",
+      "why_explanation": "If the PSU fan does not spin at all when power is applied, this strongly suggests the PSU itself has failed and is not delivering power to the system.",
+      "applicable_goals": [
+        "fault_psu_suspected",
+        "fault_motherboard_or_psu"
+      ],
+      "answer_yes_sets": [
+        "psu_fan_spinning"
+      ],
+      "answer_no_sets": [
+        "psu_fan_not_spinning"
+      ]
+    },
+    {
+      "id": "Q05",
+      "fact_id": "motherboard_standby_light_on",
+      "text": "Is the small LED standby light on the motherboard illuminated? (This is usually a small green or orange light visible through the case window or when the side panel is open.)",
+      "why_explanation": "The motherboard standby light indicates that the PSU is providing at least standby power (5VSB) to the motherboard. If this light is off despite the PSU fan spinning, the motherboard may not be receiving power or may be faulty.",
+      "applicable_goals": [
+        "fault_motherboard_or_psu"
+      ],
+      "answer_yes_sets": [
+        "motherboard_standby_light_on"
+      ],
+      "answer_no_sets": [
+        "motherboard_standby_light_off"
+      ]
+    },
+    {
+      "id": "Q06",
+      "fact_id": "no_display_on_monitor",
+      "text": "Is the monitor showing no picture at all (completely black screen) even though the computer appears to have powered on?",
+      "why_explanation": "This distinguishes between a complete power failure and a display-related issue. If the computer powers on but nothing appears on screen, we investigate the display subsystem.",
+      "applicable_goals": [
+        "fault_monitor_off",
+        "fault_display_cable_disconnected",
+        "fault_gpu_suspected",
+        "fault_ram_seating_no_display"
+      ],
+      "answer_yes_sets": [
+        "no_display_on_monitor"
+      ],
+      "answer_no_sets": []
+    },
+    {
+      "id": "Q07",
+      "fact_id": "monitor_powered_on",
+      "text": "Is the monitor turned on and showing its power indicator light?",
+      "why_explanation": "If the monitor is not switched on, that is the simplest explanation for a blank screen. We need to confirm the monitor itself is powered before investigating deeper causes.",
+      "applicable_goals": [
+        "fault_monitor_off",
+        "fault_display_cable_disconnected",
+        "fault_gpu_suspected",
+        "fault_ram_seating_no_display"
+      ],
+      "answer_yes_sets": [
+        "monitor_powered_on"
+      ],
+      "answer_no_sets": [
+        "monitor_powered_off"
+      ]
+    },
+    {
+      "id": "Q08",
+      "fact_id": "display_cable_connected",
+      "text": "Is the display cable (HDMI, VGA, or DisplayPort) securely connected to both the monitor and the computer?",
+      "why_explanation": "A loose or disconnected display cable is a very common cause of a blank screen. The cable must be firmly connected at both ends to carry the video signal.",
+      "applicable_goals": [
+        "fault_display_cable_disconnected",
+        "fault_gpu_suspected",
+        "fault_ram_seating_no_display"
+      ],
+      "answer_yes_sets": [
+        "display_cable_connected"
+      ],
+      "answer_no_sets": [
+        "display_cable_disconnected"
+      ]
+    },
+    {
+      "id": "Q09",
+      "fact_id": "gpu_beep_codes",
+      "text": "Does the computer emit a pattern of beep sounds during startup (such as a long beep or repeated short beeps)?",
+      "why_explanation": "Beep codes are diagnostic signals from the motherboard BIOS. Specific patterns indicate different hardware faults. GPU-related beep codes typically suggest the graphics card is not working correctly or is not seated properly.",
+      "applicable_goals": [
+        "fault_gpu_suspected",
+        "fault_ram_seating_no_display"
+      ],
+      "answer_yes_sets": [
+        "gpu_beep_codes"
+      ],
+      "answer_no_sets": [
+        "no_gpu_beep_codes"
+      ]
+    },
+    {
+      "id": "Q10",
+      "fact_id": "ram_not_seated",
+      "text": "When you check the RAM modules, are any of them not fully clicked into their memory slots? (Look for the side clips to be fully engaged.)",
+      "why_explanation": "Incorrectly seated RAM is a common cause of boot failure and blank screens. The RAM must be fully inserted until both retaining clips click into place.",
+      "applicable_goals": [
+        "fault_ram_seating_no_display",
+        "fault_ram_unseated"
+      ],
+      "answer_yes_sets": [
+        "ram_not_seated"
+      ],
+      "answer_no_sets": [
+        "ram_seated"
+      ]
+    },
+    {
+      "id": "Q11",
+      "fact_id": "beep_on_startup",
+      "text": "Does the computer produce any beep sounds when it is starting up?",
+      "why_explanation": "Beep codes produced by the BIOS during startup are a primary diagnostic tool for hardware faults, particularly RAM and GPU issues.",
+      "applicable_goals": [
+        "fault_ram_unseated",
+        "fault_ram_module_suspected"
+      ],
+      "answer_yes_sets": [
+        "beep_on_startup"
+      ],
+      "answer_no_sets": [
+        "no_beep_on_startup"
+      ]
+    },
+    {
+      "id": "Q12",
+      "fact_id": "ram_beep_code",
+      "text": "Does the beep pattern match a RAM-related code? (Common patterns: 3 short beeps, or 1 long + 3 short beeps, depending on BIOS manufacturer. Check your motherboard manual if unsure.)",
+      "why_explanation": "Different beep patterns indicate different hardware problems. A RAM-related beep code specifically points to a memory failure or seating issue rather than other hardware problems.",
+      "applicable_goals": [
+        "fault_ram_unseated",
+        "fault_ram_module_suspected"
+      ],
+      "answer_yes_sets": [
+        "ram_beep_code"
+      ],
+      "answer_no_sets": []
+    },
+    {
+      "id": "Q13",
+      "fact_id": "ram_error_on_screen",
+      "text": "Is there a RAM-related error message visible on screen during startup? (Examples: 'Memory error', 'No memory detected', or blue screen with MEMORY_MANAGEMENT error)",
+      "why_explanation": "On-screen error messages about memory indicate a RAM problem. This can occur even without beep codes if the system is able to display something but fails at the memory check stage.",
+      "applicable_goals": [
+        "fault_ram_compatibility"
+      ],
+      "answer_yes_sets": [
+        "ram_error_on_screen"
+      ],
+      "answer_no_sets": []
+    },
+    {
+      "id": "Q14",
+      "fact_id": "unexpected_shutdown",
+      "text": "Does the computer shut down unexpectedly or restart on its own without warning?",
+      "why_explanation": "Unexpected shutdowns are a key symptom of overheating. Modern computers automatically shut down to prevent permanent damage when components exceed safe operating temperatures.",
+      "applicable_goals": [
+        "fault_overheating_cpu",
+        "fault_cpu_fan",
+        "fault_thermal_paste",
+        "fault_poor_airflow"
+      ],
+      "answer_yes_sets": [
+        "unexpected_shutdown"
+      ],
+      "answer_no_sets": []
+    },
+    {
+      "id": "Q15",
+      "fact_id": "cpu_temperature_high",
+      "text": "Is the CPU temperature reported as unusually high? (Above 90°C under load, or above 50°C at idle, as shown by monitoring software such as HWMonitor or Core Temp.)",
+      "why_explanation": "High CPU temperature confirms that overheating is the cause of unexpected shutdowns. Without temperature data, we can still suspect overheating based on other symptoms.",
+      "applicable_goals": [
+        "fault_overheating_cpu",
+        "fault_cpu_fan",
+        "fault_thermal_paste"
+      ],
+      "answer_yes_sets": [
+        "cpu_temperature_high"
+      ],
+      "answer_no_sets": []
+    },
+    {
+      "id": "Q16",
+      "fact_id": "cpu_fan_spinning",
+      "text": "Is the CPU cooler fan spinning when the computer is running?",
+      "why_explanation": "A non-spinning CPU fan is a direct cause of overheating. The CPU cooler must circulate air across the heatsink to maintain safe temperatures.",
+      "applicable_goals": [
+        "fault_cpu_fan",
+        "fault_thermal_paste"
+      ],
+      "answer_yes_sets": [
+        "cpu_fan_spinning"
+      ],
+      "answer_no_sets": [
+        "cpu_fan_not_spinning"
+      ]
+    },
+    {
+      "id": "Q17",
+      "fact_id": "thermal_paste_dried",
+      "text": "Has the thermal paste between the CPU and cooler not been replaced in several years, or does it appear dried out and cracked?",
+      "why_explanation": "Thermal paste degrades over time, reducing its ability to transfer heat from the CPU to the cooler. Dried thermal paste is a common cause of overheating in older systems.",
+      "applicable_goals": [
+        "fault_thermal_paste"
+      ],
+      "answer_yes_sets": [
+        "thermal_paste_dried"
+      ],
+      "answer_no_sets": []
+    },
+    {
+      "id": "Q18",
+      "fact_id": "case_vents_blocked",
+      "text": "Are the computer's intake or exhaust vents blocked or covered? (For example, placed against a wall, or vents clogged with dust.)",
+      "why_explanation": "Blocked vents prevent proper airflow through the computer case, trapping heat and causing thermal shutdowns even if all cooling components are functioning.",
+      "applicable_goals": [
+        "fault_poor_airflow"
+      ],
+      "answer_yes_sets": [
+        "case_vents_blocked"
+      ],
+      "answer_no_sets": []
+    },
+    {
+      "id": "Q19",
+      "fact_id": "drive_detected_in_bios",
+      "text": "Is the storage drive (hard disk or SSD) visible and detected when you check the BIOS/UEFI settings screen?",
+      "why_explanation": "BIOS detection confirms whether the motherboard can communicate with the storage drive at all. If not detected, the problem is with the connection or the drive hardware. If detected, the problem is with the software (OS or boot records).",
+      "applicable_goals": [
+        "fault_storage_cable",
+        "fault_storage_mechanical",
+        "fault_storage_electronic",
+        "fault_os_boot"
+      ],
+      "answer_yes_sets": [
+        "drive_detected_in_bios"
+      ],
+      "answer_no_sets": [
+        "drive_not_detected_in_bios"
+      ]
+    },
+    {
+      "id": "Q20",
+      "fact_id": "storage_data_cable_connected",
+      "text": "Is the data cable (SATA cable for HDDs/SSDs, or M.2 card for NVMe drives) properly connected to both the drive and the motherboard?",
+      "why_explanation": "A loose or disconnected data cable is the simplest reason a drive would not be detected. The data cable carries the communication signal between the drive and the motherboard.",
+      "applicable_goals": [
+        "fault_storage_cable",
+        "fault_storage_mechanical",
+        "fault_storage_electronic"
+      ],
+      "answer_yes_sets": [
+        "storage_data_cable_connected"
+      ],
+      "answer_no_sets": [
+        "storage_data_cable_disconnected"
+      ]
+    },
+    {
+      "id": "Q21",
+      "fact_id": "drive_clicking_sound",
+      "text": "Can you hear a clicking or grinding sound coming from the hard drive area when the computer is running?",
+      "why_explanation": "Clicking or grinding sounds from a hard drive (the 'click of death') indicate mechanical failure of the drive's internal components. This is a serious warning sign that data may be lost soon.",
+      "applicable_goals": [
+        "fault_storage_mechanical",
+        "fault_storage_electronic"
+      ],
+      "answer_yes_sets": [
+        "drive_clicking_sound"
+      ],
+      "answer_no_sets": [
+        "no_drive_clicking_sound"
+      ]
+    },
+    {
+      "id": "Q22",
+      "fact_id": "boot_error_on_screen",
+      "text": "Is there a boot error message displayed on screen, such as 'Operating System not found', 'BOOTMGR is missing', or a similar message?",
+      "why_explanation": "A boot error message when the drive is detected indicates the problem is with the operating system or boot records rather than the drive hardware itself.",
+      "applicable_goals": [
+        "fault_os_boot"
+      ],
+      "answer_yes_sets": [
+        "boot_error_on_screen"
+      ],
+      "answer_no_sets": []
+    },
+    {
+      "id": "Q23",
+      "fact_id": "os_missing_or_corrupted",
+      "text": "Was the operating system recently uninstalled, corrupted, or was the drive recently formatted?",
+      "why_explanation": "If the OS has been removed, corrupted by malware, or the drive formatted, the system will fail to boot even if the drive hardware is working perfectly.",
+      "applicable_goals": [
+        "fault_os_boot"
+      ],
+      "answer_yes_sets": [
+        "os_missing_or_corrupted"
+      ],
+      "answer_no_sets": []
+    },
+    {
+      "id": "Q24",
+      "fact_id": "post_beep_code_heard",
+      "text": "When you press the power button, does the computer emit a continuous or repeating beep pattern from the motherboard speaker (not the normal single short startup beep)?",
+      "why_explanation": "A POST (Power-On Self-Test) beep code indicates the motherboard detected a hardware fault during startup self-test. Continuous or repeating patterns typically signal a RAM, GPU, or motherboard fault at the POST stage before any OS loads.",
+      "applicable_goals": [
+        "fault_post_failure",
+        "fault_cmos_battery"
+      ],
+      "answer_yes_sets": [
+        "post_beep_code_heard"
+      ],
+      "answer_no_sets": [
+        "no_post_beep_code"
+      ]
+    },
+    {
+      "id": "Q25",
+      "fact_id": "bios_date_reset_on_boot",
+      "text": "Does the system clock reset to an old date (e.g. year 2002 or 2004) or show a BIOS date/time error message every time the computer is switched on, even after you set the correct time?",
+      "why_explanation": "The CMOS battery on the motherboard keeps the BIOS clock and settings alive when the computer is powered off. If the date resets every time, the CMOS battery is almost certainly flat and needs replacing — this is a cheap, safe fix.",
+      "applicable_goals": [
+        "fault_cmos_battery"
+      ],
+      "answer_yes_sets": [
+        "bios_date_reset_on_boot"
+      ],
+      "answer_no_sets": []
+    },
+    {
+      "id": "Q26",
+      "fact_id": "post_no_video_no_beep",
+      "text": "Does the computer power on (fans spin, LEDs light up) but the monitor remains completely blank with no beep codes and no BIOS or manufacturer screen appearing at all?",
+      "why_explanation": "If power is present but there is no video output and no POST beep codes, the startup self-test is failing before the GPU or display is initialised. This points to a serious hardware fault — commonly a RAM or motherboard problem at the very earliest stage of startup.",
+      "applicable_goals": [
+        "fault_post_failure"
+      ],
+      "answer_yes_sets": [
+        "post_no_video_no_beep"
+      ],
+      "answer_no_sets": []
+    }
+  ],
+  "diagnostic_goals": [
+    {
+      "id": "goal_no_power",
+      "label": "Computer Does Not Power On",
+      "description": "The computer shows no sign of life when the power button is pressed.",
+      "target_conclusions": [
+        "fault_power_cable_disconnected",
+        "fault_power_button",
+        "fault_psu_suspected",
+        "fault_motherboard_or_psu",
+        "fault_no_power_unknown"
+      ],
+      "initial_facts": [],
+      "icon": "⚡"
+    },
+    {
+      "id": "goal_no_display",
+      "label": "Computer Powers On But Shows No Display",
+      "description": "The computer appears to start up but the monitor remains blank.",
+      "target_conclusions": [
+        "fault_monitor_off",
+        "fault_display_cable_disconnected",
+        "fault_gpu_suspected",
+        "fault_ram_seating_no_display"
+      ],
+      "initial_facts": [
+        "computer_powers_on"
+      ],
+      "icon": "🖥️"
+    },
+    {
+      "id": "goal_ram_failure",
+      "label": "Possible RAM-Related Startup Failure",
+      "description": "The computer fails to start properly with beep codes or RAM-related errors.",
+      "target_conclusions": [
+        "fault_ram_unseated",
+        "fault_ram_module_suspected",
+        "fault_ram_compatibility"
+      ],
+      "initial_facts": [],
+      "icon": "🔧"
+    },
+    {
+      "id": "goal_overheating",
+      "label": "Computer Overheating or Unexpectedly Shutting Down",
+      "description": "The computer shuts down without warning or runs very hot.",
+      "target_conclusions": [
+        "fault_cpu_fan",
+        "fault_thermal_paste",
+        "fault_poor_airflow",
+        "fault_overheating_cpu"
+      ],
+      "initial_facts": [],
+      "icon": "🌡️"
+    },
+    {
+      "id": "goal_storage_failure",
+      "label": "Storage Drive or Boot Failure",
+      "description": "The computer cannot find or boot from the storage drive.",
+      "target_conclusions": [
+        "fault_storage_cable",
+        "fault_storage_mechanical",
+        "fault_storage_electronic",
+        "fault_os_boot"
+      ],
+      "initial_facts": [],
+      "icon": "💾"
+    },
+    {
+      "id": "goal_gpu_display",
+      "label": "Graphics Card or Display Output Failure",
+      "description": "The computer powers on but the screen shows no image — investigating GPU, display cable, and monitor faults.",
+      "target_conclusions": [
+        "fault_gpu_suspected",
+        "fault_display_cable_disconnected",
+        "fault_monitor_off"
+      ],
+      "initial_facts": [
+        "computer_powers_on"
+      ],
+      "icon": "🖥"
+    },
+    {
+      "id": "goal_cpu_cooling",
+      "label": "CPU Cooling or Fan Failure",
+      "description": "The computer overheats, shuts down unexpectedly, or the CPU fan may not be spinning correctly.",
+      "target_conclusions": [
+        "fault_cpu_fan",
+        "fault_thermal_paste",
+        "fault_poor_airflow"
+      ],
+      "initial_facts": [],
+      "icon": "🌡"
+    },
+    {
+      "id": "goal_ram_errors",
+      "label": "RAM Detection or Memory Errors",
+      "description": "The computer fails to start with beep codes, or reports memory errors on screen — diagnosing RAM seating, module faults, and compatibility.",
+      "target_conclusions": [
+        "fault_ram_unseated",
+        "fault_ram_module_suspected",
+        "fault_ram_compatibility"
+      ],
+      "initial_facts": [],
+      "icon": "💾"
+    },
+    {
+      "id": "goal_bios_post",
+      "label": "BIOS / POST Startup Failure",
+      "description": "The computer powers on but fails the Power-On Self-Test (POST), shows no BIOS screen, or exhibits CMOS battery symptoms such as clock resets.",
+      "target_conclusions": [
+        "fault_post_failure",
+        "fault_cmos_battery"
+      ],
+      "initial_facts": [
+        "computer_powers_on"
+      ],
+      "icon": "📋"
+    }
+  ]
+}

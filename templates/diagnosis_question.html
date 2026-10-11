@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% block title %}Diagnosis — Question{% endblock %}
+
+{% block content %}
+<div class="page-inner page-narrow">
+
+  <!-- Progress bar -->
+  <div class="diag-header" aria-label="Diagnosis progress">
+    <div class="diag-goal-label">
+      <span aria-hidden="true">{{ goal.icon }}</span>
+      {{ goal.label }}
+    </div>
+    <div class="diag-progress-info">
+      Question {{ questions_asked + 1 }}
+      {% if answers_log %}· {{ answers_log | length }} answered so far{% endif %}
+    </div>
+  </div>
+
+  <!-- Answer history (collapsible) -->
+  {% if answers_log %}
+  <details class="answers-history" id="answers-history">
+    <summary class="answers-history-toggle">
+      <span>📝 Answers So Far ({{ answers_log | length }})</span>
+      <span class="toggle-arrow" aria-hidden="true">▾</span>
+    </summary>
+    <div class="answers-history-list">
+      {% for ans in answers_log %}
+      <div class="history-answer-row">
+        <span class="history-q">{{ loop.index }}. {{ ans.question_text }}</span>
+        <span class="history-a answer-{{ ans.answer }}">
+          {% if ans.answer == 'yes' %}✓ Yes{% elif ans.answer == 'no' %}✗ No{% else %}? Unknown{% endif %}
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+  </details>
+  {% endif %}
+
+  <!-- Question card -->
+  <div class="question-card" role="main" aria-labelledby="question-text">
+    <div class="question-number" aria-hidden="true">
+      Q{{ questions_asked + 1 }}
+    </div>
+
+    <h1 id="question-text" class="question-text">
+      {{ question.text }}
+    </h1>
+
+    <!-- WHY button -->
+    <button class="why-btn" id="why-btn" type="button" aria-expanded="false" aria-controls="why-panel">
+      <span aria-hidden="true">❓</span> Why is this being asked?
+    </button>
+
+    <!-- WHY panel (filled via AJAX) -->
+    <div class="why-panel" id="why-panel" role="region" aria-label="Why this question" hidden>
+      <div class="why-panel-header">
+        <span aria-hidden="true">🔍</span>
+        <strong>Why this question is being asked</strong>
+        <button class="why-close" type="button" aria-label="Close explanation" onclick="document.getElementById('why-panel').hidden=true;document.getElementById('why-btn').setAttribute('aria-expanded','false')">×</button>
+      </div>
+      <div class="why-panel-body" id="why-panel-body">
+        <div class="why-loading" aria-live="polite">Loading explanation...</div>
+      </div>
+    </div>
+
+    <!-- Answer form -->
+    <form method="POST" action="{{ url_for('diagnosis_answer') }}" class="answer-form" id="answer-form">
+      <input type="hidden" name="question_id" value="{{ question.id }}" />
+
+      <div class="answer-buttons" role="group" aria-label="Answer choices">
+        <button type="submit" name="answer" value="yes" class="btn btn-answer btn-yes" id="answer-yes">
+          <span class="answer-icon" aria-hidden="true">✓</span>
+          <span class="answer-label">Yes</span>
+        </button>
+        <button type="submit" name="answer" value="no" class="btn btn-answer btn-no" id="answer-no">
+          <span class="answer-icon" aria-hidden="true">✗</span>
+          <span class="answer-label">No</span>
+        </button>
+        <button type="submit" name="answer" value="unknown" class="btn btn-answer btn-unknown" id="answer-unknown">
+          <span class="answer-icon" aria-hidden="true">?</span>
+          <span class="answer-label">Unknown</span>
+        </button>
+      </div>
+    </form>
+
+    <!-- Navigation -->
+    <div class="diag-nav">
+      {% if answers_log %}
+      <form method="POST" action="{{ url_for('diagnosis_back') }}" class="back-form" id="back-form">
+        <button type="submit" class="btn btn-ghost btn-sm" id="back-btn">
+          ← Go Back
+        </button>
+      </form>
+      {% endif %}
+      <a href="{{ url_for('diagnosis_new') }}" class="btn btn-ghost btn-sm" id="cancel-diag-btn">
+        ✕ Cancel
+      </a>
+    </div>
+  </div>
+
+  <!-- Context note -->
+  <div class="context-note" role="note">
+    <span aria-hidden="true">ℹ</span>
+    Answer based on what you can directly observe. If you are unsure, select
+    <strong>Unknown</strong> — the engine will note this and continue with available evidence.
+    Do not guess; an incorrect answer may lead to a wrong diagnosis.
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Load WHY explanation via AJAX
+  const whyBtn = document.getElementById('why-btn');
+  const whyPanel = document.getElementById('why-panel');
+  const whyBody = document.getElementById('why-panel-body');
+  let whyLoaded = false;
+
+  whyBtn.addEventListener('click', function() {
+    const expanded = whyPanel.hidden;
+    whyPanel.hidden = !expanded;
+    whyBtn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+
+    if (expanded && !whyLoaded) {
+      whyLoaded = true;
+      fetch('/diagnosis/why')
+        .then(r => r.json())
+        .then(data => {
+          if (data.error) {
+            whyBody.innerHTML = '<p class="why-error">Could not load explanation: ' + data.error + '</p>';
+            return;
+          }
+          whyBody.innerHTML = renderWhyExplanation(data);
+        })
+        .catch(() => {
+          whyBody.innerHTML = '<p class="why-error">Could not load explanation. Please try again.</p>';
+        });
+    }
+  });
+
+  function renderWhyExplanation(data) {
+    let html = '';
+
+    html += '<div class="why-goal">';
+    html += '<strong>Diagnostic Goal:</strong> ' + escHtml(data.diagnostic_goal.label);
+    html += '</div>';
+
+    html += '<div class="why-investigating">';
+    html += '<strong>Currently investigating:</strong> ' + escHtml(data.investigating_conclusion.label);
+    html += '</div>';
+
+    if (data.why_needed) {
+      html += '<div class="why-reason">';
+      html += '<strong>Why this question matters:</strong><br>' + escHtml(data.why_needed);
+      html += '</div>';
+    }
+
+    if (data.rules_needing_this_fact && data.rules_needing_this_fact.length > 0) {
+      html += '<div class="why-rules">';
+      html += '<strong>Rules that need this fact:</strong>';
+      html += '<ul class="why-rules-list">';
+      for (const rule of data.rules_needing_this_fact) {
+        html += '<li><span class="rule-id-badge">' + escHtml(rule.id) + '</span> ';
+        html += escHtml(rule.description) + '</li>';
+      }
+      html += '</ul></div>';
+    }
+
+    if (data.known_facts_so_far && data.known_facts_so_far.length > 0) {
+      html += '<div class="why-known">';
+      html += '<strong>Facts established so far:</strong>';
+      html += '<ul class="why-facts-list">';
+      for (const f of data.known_facts_so_far) {
+        const icon = f.answer === 'yes' ? '✓' : f.answer === 'no' ? '✗' : '?';
+        const cls = 'answer-' + f.answer;
+        html += '<li><span class="' + cls + '">' + icon + ' ' + escHtml(f.answer.toUpperCase()) + '</span>: ' + escHtml(f.question) + '</li>';
+      }
+      html += '</ul></div>';
+    }
+
+    return html;
+  }
+
+  function escHtml(str) {
+    const d = document.createElement('div');
+    d.appendChild(document.createTextNode(str || ''));
+    return d.innerHTML;
+  }
+</script>
+{% endblock %}

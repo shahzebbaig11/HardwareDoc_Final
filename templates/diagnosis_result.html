@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Diagnosis Result{% endblock %}
+
+{% block content %}
+<div class="page-inner page-narrow">
+
+  <!-- Result header -->
+  <div class="result-header result-{{ result.confidence }}">
+    <div class="result-status-badge" role="status">
+      {% if result.confidence == 'confirmed' %}✓ Confirmed by Rules
+      {% elif result.confidence == 'suspected' %}⚠ Suspected
+      {% else %}◌ Insufficient Evidence
+      {% endif %}
+    </div>
+    <h1 class="result-title" id="result-title">{{ result.conclusion_label }}</h1>
+    <p class="result-status-desc">{{ result.status_description }}</p>
+  </div>
+
+  <!-- Goal info -->
+  <div class="result-meta">
+    <span class="result-meta-item">
+      <span aria-hidden="true">🎯</span>
+      <strong>Goal:</strong> {{ result.goal_label }}
+    </span>
+    {% if result.rules_used %}
+    <span class="result-meta-item">
+      <span aria-hidden="true">📏</span>
+      <strong>Rules fired:</strong> {{ result.rules_used | join(', ') }}
+    </span>
+    {% endif %}
+  </div>
+
+  <!-- Description -->
+  {% if result.conclusion_description %}
+  <div class="result-section">
+    <h2 class="result-section-title">What This Means</h2>
+    <p class="result-description">{{ result.conclusion_description }}</p>
+  </div>
+  {% endif %}
+
+  <!-- Known facts -->
+  {% if result.known_facts %}
+  <div class="result-section">
+    <h2 class="result-section-title">Evidence Collected</h2>
+    <div class="facts-table">
+      {% for fact in result.known_facts %}
+      <div class="fact-row">
+        <span class="fact-question">{{ fact.question }}</span>
+        <span class="fact-answer answer-{{ fact.answer }}">
+          {% if fact.answer == 'yes' %}✓ Yes
+          {% elif fact.answer == 'no' %}✗ No
+          {% else %}? Unknown{% endif %}
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Rules fired -->
+  {% if result.fired_rules %}
+  <div class="result-section">
+    <h2 class="result-section-title">Rules That Fired</h2>
+    <div class="rules-list">
+      {% for rule in result.fired_rules %}
+      <div class="rule-item">
+        <span class="rule-id-badge">{{ rule.id }}</span>
+        <span class="rule-desc">{{ rule.description }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Next steps -->
+  {% if result.next_steps %}
+  <div class="result-section">
+    <h2 class="result-section-title">Recommended Next Steps</h2>
+    <ol class="next-steps-list">
+      {% for step in result.next_steps %}
+      <li>{{ step }}</li>
+      {% endfor %}
+    </ol>
+  </div>
+  {% endif %}
+
+  <!-- Safety note -->
+  {% if result.safety_note %}
+  <div class="safety-note" role="note">
+    <span class="safety-icon" aria-hidden="true">⚠</span>
+    <div>
+      <strong>Safety Notice:</strong> {{ result.safety_note }}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Disclaimer -->
+  <div class="disclaimer" role="note">
+    <strong>Educational Use Disclaimer:</strong> This diagnosis is produced by a
+    rule-based expert system for educational purposes only. It is not a substitute
+    for professional hardware testing. Always consult a qualified technician before
+    performing hardware repairs or replacements.
+  </div>
+
+  <!-- Actions -->
+  <div class="result-actions">
+    <a href="{{ url_for('diagnosis_how') }}" class="btn btn-primary" id="how-btn">
+      🔍 How was this concluded? (HOW)
+    </a>
+    <a href="{{ url_for('diagnosis_new') }}" class="btn btn-secondary" id="new-diag-btn">
+      ➕ New Diagnosis
+    </a>
+    {% if session_id %}
+    <a href="{{ url_for('history_detail', session_id=session_id) }}" class="btn btn-ghost" id="view-saved-btn">
+      📋 View Saved Record
+    </a>
+    {% endif %}
+    <button onclick="window.print()" class="btn btn-ghost" id="print-btn">
+      🖨 Print Report
+    </button>
+  </div>
+
+</div>
+{% endblock %}

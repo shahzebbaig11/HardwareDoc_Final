@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Session {{ record.session_id[:8] }}{% endblock %}
+
+{% block content %}
+<div class="page-inner page-narrow">
+  <div class="page-header">
+    <a href="{{ url_for('history') }}" class="back-link" id="back-to-history">← Back to History</a>
+    <h1 class="page-title">Diagnosis Record</h1>
+    <p class="page-subtitle">Session {{ record.session_id[:8] }}... · {{ record.created_at | replace('T', ' ') }}</p>
+  </div>
+
+  <!-- Result summary -->
+  <div class="result-header result-{{ record.confidence }}">
+    <div class="result-status-badge">
+      {% if record.confidence == 'confirmed' %}✓ Confirmed by Rules
+      {% elif record.confidence == 'suspected' %}⚠ Suspected
+      {% else %}◌ Insufficient Evidence
+      {% endif %}
+    </div>
+    <h2 class="result-title">{{ record.conclusion_label }}</h2>
+  </div>
+
+  <div class="result-meta">
+    <span class="result-meta-item">
+      <strong>Goal:</strong> {{ record.goal_label }}
+    </span>
+    <span class="result-meta-item">
+      <strong>Questions asked:</strong> {{ record.questions_asked }}
+    </span>
+    <span class="result-meta-item">
+      <strong>Date:</strong> {{ record.created_at | replace('T', ' ') }}
+    </span>
+  </div>
+
+  <!-- Stored inference snapshot -->
+  {% if record.inference_summary %}
+  {% set snap = record.inference_summary %}
+
+  {% if snap.conclusion_description %}
+  <div class="result-section">
+    <h2 class="result-section-title">What Was Diagnosed</h2>
+    <p class="result-description">{{ snap.conclusion_description }}</p>
+  </div>
+  {% endif %}
+
+  {% if snap.known_facts %}
+  <div class="result-section">
+    <h2 class="result-section-title">Evidence Collected During This Session</h2>
+    <div class="facts-table">
+      {% for fact in snap.known_facts %}
+      <div class="fact-row">
+        <span class="fact-question">{{ fact.question }}</span>
+        <span class="fact-answer answer-{{ fact.answer }}">
+          {% if fact.answer == 'yes' %}✓ Yes
+          {% elif fact.answer == 'no' %}✗ No
+          {% else %}? Unknown{% endif %}
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if snap.fired_rules %}
+  <div class="result-section">
+    <h2 class="result-section-title">Rules That Fired</h2>
+    <div class="rules-list">
+      {% for rule in snap.fired_rules %}
+      <div class="rule-item">
+        <span class="rule-id-badge">{{ rule.id }}</span>
+        <span class="rule-desc">{{ rule.description }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if snap.next_steps %}
+  <div class="result-section">
+    <h2 class="result-section-title">Recommended Next Steps</h2>
+    <ol class="next-steps-list">
+      {% for step in snap.next_steps %}
+      <li>{{ step }}</li>
+      {% endfor %}
+    </ol>
+  </div>
+  {% endif %}
+
+  {% if snap.safety_note %}
+  <div class="safety-note" role="note">
+    <span class="safety-icon" aria-hidden="true">⚠</span>
+    <div><strong>Safety Notice:</strong> {{ snap.safety_note }}</div>
+  </div>
+  {% endif %}
+  {% endif %}
+
+  <div class="disclaimer" role="note">
+    <strong>Educational Use Disclaimer:</strong> This historical record was produced by a
+    rule-based expert system for educational purposes only. It is not a substitute for
+    professional hardware testing.
+  </div>
+
+  <!-- Actions -->
+  <div class="result-actions">
+    <a href="{{ url_for('history') }}" class="btn btn-secondary" id="hist-back-btn">← Back to History</a>
+    <a href="{{ url_for('diagnosis_new') }}" class="btn btn-primary" id="hist-new-diag-btn">➕ New Diagnosis</a>
+    <button onclick="window.print()" class="btn btn-ghost" id="hist-print-btn">🖨 Print</button>
+    <button class="btn btn-danger btn-sm"
+            onclick="confirmDeleteRecord('{{ record.session_id }}')"
+            id="hist-delete-btn">
+      🗑 Delete This Record
+    </button>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function confirmDeleteRecord(sessionId) {
+  if (confirm('Delete this diagnosis record? This cannot be undone.')) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/history/' + sessionId + '/delete';
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,232 @@
+{
+  "metadata": {
+    "title": "Hardware Diagnostic Dataset",
+    "description": "Structured educational diagnostic case records for the Expert System for Computer Hardware Fault Diagnosis. These are manually authored educational examples created to illustrate backward chaining reasoning paths. They are NOT measured real-world data.",
+    "provenance": "Manually authored educational examples for BCA mini-project demonstration.",
+    "version": "1.0",
+    "created": "2026-10-10",
+    "author": "HardwareDoc Project Team"
+  },
+  "cases": [
+    {
+      "id": "CASE-001",
+      "description": "Classic case: computer completely dead due to disconnected power cable",
+      "category": "no_power",
+      "symptom_facts": ["no_power_sign", "power_cable_disconnected"],
+      "expected_conclusion": "fault_power_cable_disconnected",
+      "expected_status": "confirmed",
+      "applicable_rules": ["R01"],
+      "reasoning_explanation": "No power sign and confirmed disconnected cable directly triggers R01. This is a simple, fully confirmed diagnosis requiring only two known facts.",
+      "provenance": "manually_authored_educational"
+    },
+    {
+      "id": "CASE-002",
+      "description": "Computer dead with connected cable but PSU fan not spinning",
+      "category": "no_power",
+      "symptom_facts": ["no_power_sign", "power_cable_connected", "psu_fan_not_spinning"],
+      "expected_conclusion": "fault_psu_suspected",
+      "expected_status": "suspected",
+      "applicable_rules": ["R03"],
+      "reasoning_explanation": "Power cable is connected (R01 ruled out), power button appears functional, but PSU fan does not spin. R03 fires with a 'suspected' confidence because PSU failure cannot be confirmed without professional testing.",
+      "provenance": "manually_authored_educational"
+    },
+    {
+      "id": "CASE-003",
+      "description": "Computer dead, cable connected, PSU fan spins, but standby light is off",
+      "category": "no_power",
+      "symptom_facts": ["no_power_sign", "power_cable_connected", "psu_fan_spinning", "motherboard_standby_light_off"],
+      "expected_conclusion": "fault_motherboard_or_psu",
+      "expected_status": "suspected",
+      "applicable_rules": ["R04"],
+      "reasoning_explanation": "PSU appears to have some function (fan spins), but the motherboard is not receiving standby power. This implicates either the PSU's voltage regulators or the motherboard itself. R04 fires with suspected confidence.",
+      "provenance": "manually_authored_educational"
+    },
+    {
+      "id": "CASE-004",
+      "description": "Monitor off — simplest display issue",
+      "category": "no_display",
+      "symptom_facts": ["computer_powers_on", "no_display_on_monitor", "monitor_powered_off"],
+      "expected_conclusion": "fault_monitor_off",
+      "expected_status": "confirmed",
+      "applicable_rules": ["R05"],
+      "reasoning_explanation": "Computer has power, display cable might be fine, but the monitor is not powered on. R05 fires with confirmed status because the cause is definitively established.",
+      "provenance": "manually_authored_educational"
+    },
+    {
+      "id": "CASE-005",
+      "description": "No display due to disconnected HDMI cable",
+      "category": "no_display",
+      "symptom_facts": ["computer_powers_on", "no_display_on_monitor", "monitor_powered_on", "display_cable_disconnected"],
+      "expected_conclusion": "fault_display_cable_disconnected",
+      "expected_status": "confirmed",
+      "applicable_rules": ["R06"],
+      "reasoning_explanation": "Monitor is on, computer is on, but the display cable is not connected. R06 fires and gives a confirmed result because the disconnected cable is directly observable.",
+      "provenance": "manually_authored_educational"
+    },
+    {
+      "id": "CASE-006",
+      "description": "No display with GPU beep codes — cable and monitor are fine",
+      "category": "no_display",
+      "symptom_facts": ["computer_powers_on", "no_display_on_monitor", "monitor_powered_on", "display_cable_connected", "gpu_beep_codes"],
+      "expected_conclusion": "fault_gpu_suspected",
+      "expected_status": "suspected",
+      "applicable_rules": ["R07"],
+      "reasoning_explanation": "All physical connections are fine and the monitor is powered, but GPU beep codes are present. R07 fires with suspected status because beep codes are strongly suggestive but GPU fault requires professional testing to confirm.",
+      "provenance": "manually_authored_educational"
+    },
+    {
+      "id": "CASE-007",
+      "description": "No display, cable and monitor fine, no beep codes, RAM not seated",
+      "category": "no_display",
+      "symptom_facts": ["computer_powers_on", "no_display_on_monitor", "monitor_powered_on", "display_cable_connected", "no_gpu_beep_codes", "ram_not_seated"],
+      "expected_conclusion": "fault_ram_seating_no_display",
+      "expected_status": "suspected",
+      "applicable_rules": ["R08"],
+      "reasoning_explanation": "Monitor and cable are fine, no GPU beep codes pointing to GPU, but RAM is visibly unseated. R08 fires. Status is suspected because reseating and retesting is required to confirm.",
+      "provenance": "manually_authored_educational"
+    },
+    {
+      "id": "CASE-008",
+      "description": "RAM-related beep codes with unseated RAM sticks",
+      "category": "ram_failure",
+      "symptom_facts": ["beep_on_startup", "ram_beep_code", "ram_not_seated"],
+      "expected_conclusion": "fault_ram_unseated",
+      "expected_status": "confirmed",
+      "applicable_rules": ["R09"],
+      "reasoning_explanation": "Beep codes are RAM-specific and RAM is visibly not seated. R09 fires with confirmed status because both the beep evidence and physical evidence align.",
+      "provenance": "manually_authored_educational"
+    },
+    {
+      "id": "CASE-009",
+      "description": "RAM beep codes but RAM appears correctly seated",
+      "category": "ram_failure",
+      "symptom_facts": ["beep_on_startup", "ram_beep_code", "ram_seated"],
+      "expected_conclusion": "fault_ram_module_suspected",
+      "expected_status": "suspected",
+      "applicable_rules": ["R10"],
+      "reasoning_explanation": "RAM is seated correctly but beep codes persist, suggesting the RAM module itself has failed. R10 fires with suspected status since physical RAM failure requires hardware testing to confirm.",
+      "provenance": "manually_authored_educational"
+    },
+    {
+      "id": "CASE-010",
+      "description": "RAM error message visible on screen without beep codes",
+      "category": "ram_failure",
+      "symptom_facts": ["no_beep_on_startup", "ram_error_on_screen"],
+      "expected_conclusion": "fault_ram_compatibility",
+      "expected_status": "suspected",
+      "applicable_rules": ["R11"],
+      "reasoning_explanation": "System can display something (BIOS screen visible) but RAM errors appear. No beep codes. This typically indicates a RAM compatibility issue or a failing module that passes initial tests. R11 fires with suspected status.",
+      "provenance": "manually_authored_educational"
+    },
+    {
+      "id": "CASE-011",
+      "description": "Unexpected shutdown with high CPU temperature and fan not spinning",
+      "category": "overheating",
+      "symptom_facts": ["unexpected_shutdown", "cpu_temperature_high", "cpu_fan_not_spinning"],
+      "expected_conclusion": "fault_cpu_fan",
+      "expected_status": "confirmed",
+      "applicable_rules": ["R13"],
+      "reasoning_explanation": "Unexpected shutdown, CPU temperature is dangerously high, and the CPU fan is confirmed not spinning. R13 fires with confirmed status — the non-spinning fan is a direct observable cause.",
+      "provenance": "manually_authored_educational"
+    },
+    {
+      "id": "CASE-012",
+      "description": "Unexpected shutdown, high temp, fan spins, old thermal paste",
+      "category": "overheating",
+      "symptom_facts": ["unexpected_shutdown", "cpu_temperature_high", "cpu_fan_spinning", "thermal_paste_dried"],
+      "expected_conclusion": "fault_thermal_paste",
+      "expected_status": "suspected",
+      "applicable_rules": ["R14"],
+      "reasoning_explanation": "Fan is functional but temperatures are still high. Old, dried thermal paste is the most likely cause of poor heat transfer. R14 fires with suspected status.",
+      "provenance": "manually_authored_educational"
+    },
+    {
+      "id": "CASE-013",
+      "description": "Unexpected shutdown with blocked case vents",
+      "category": "overheating",
+      "symptom_facts": ["unexpected_shutdown", "case_vents_blocked"],
+      "expected_conclusion": "fault_poor_airflow",
+      "expected_status": "suspected",
+      "applicable_rules": ["R15"],
+      "reasoning_explanation": "Computer shuts down unexpectedly. Vents are blocked, preventing adequate airflow. R15 fires with suspected status because temperature monitoring was not performed to confirm overheating as the cause.",
+      "provenance": "manually_authored_educational"
+    },
+    {
+      "id": "CASE-014",
+      "description": "Drive not detected in BIOS due to disconnected SATA cable",
+      "category": "storage_failure",
+      "symptom_facts": ["drive_not_detected_in_bios", "storage_data_cable_disconnected"],
+      "expected_conclusion": "fault_storage_cable",
+      "expected_status": "confirmed",
+      "applicable_rules": ["R16"],
+      "reasoning_explanation": "Drive is not seen in BIOS and data cable is physically disconnected. R16 fires with confirmed status — the cause is directly observable and fixable.",
+      "provenance": "manually_authored_educational"
+    },
+    {
+      "id": "CASE-015",
+      "description": "Drive not detected in BIOS, cable connected, drive clicking",
+      "category": "storage_failure",
+      "symptom_facts": ["drive_not_detected_in_bios", "storage_data_cable_connected", "drive_clicking_sound"],
+      "expected_conclusion": "fault_storage_mechanical",
+      "expected_status": "suspected",
+      "applicable_rules": ["R17"],
+      "reasoning_explanation": "Cable is connected but the drive is not detected and clicking sounds are present. This is a classic symptom of mechanical HDD failure. R17 fires with suspected status — clinical diagnosis requires professional assessment.",
+      "provenance": "manually_authored_educational"
+    },
+    {
+      "id": "CASE-016",
+      "description": "Drive detected in BIOS but OS boot fails with error message",
+      "category": "storage_failure",
+      "symptom_facts": ["boot_error_on_screen", "drive_detected_in_bios", "os_missing_or_corrupted"],
+      "expected_conclusion": "fault_os_boot",
+      "expected_status": "suspected",
+      "applicable_rules": ["R18"],
+      "reasoning_explanation": "Hardware is intact (drive is detected), but the OS or boot loader is corrupted or missing. This is a software-level fault. R18 fires with suspected status because recovery may be possible.",
+      "provenance": "manually_authored_educational"
+    },
+    {
+      "id": "CASE-017",
+      "description": "Drive not detected, cable connected, no clicking — electronic failure suspected",
+      "category": "storage_failure",
+      "symptom_facts": ["drive_not_detected_in_bios", "storage_data_cable_connected", "no_drive_clicking_sound"],
+      "expected_conclusion": "fault_storage_electronic",
+      "expected_status": "suspected",
+      "applicable_rules": ["R19"],
+      "reasoning_explanation": "Drive not detected, cable is fine, no clicking (so not mechanical). Electronic circuit failure on the drive's PCB is suspected. R19 fires with suspected status.",
+      "provenance": "manually_authored_educational"
+    },
+    {
+      "id": "CASE-018",
+      "description": "Insufficient evidence — computer dead, cable connected, fan spins, standby light is on",
+      "category": "no_power",
+      "symptom_facts": ["no_power_sign", "power_cable_connected", "psu_fan_spinning", "motherboard_standby_light_on"],
+      "expected_conclusion": "fault_no_power_unknown",
+      "expected_status": "insufficient_evidence",
+      "applicable_rules": ["R20"],
+      "reasoning_explanation": "All visible checks pass but the computer still won't start. This is an ambiguous case where professional diagnosis is required. No specific fault rule can fire with confidence.",
+      "provenance": "manually_authored_educational"
+    },
+    {
+      "id": "CASE-019",
+      "description": "Ambiguous overheating — unexpected shutdown but no temperature data available",
+      "category": "overheating",
+      "symptom_facts": ["unexpected_shutdown"],
+      "expected_conclusion": null,
+      "expected_status": "insufficient_evidence",
+      "applicable_rules": [],
+      "reasoning_explanation": "Only shutdown is known but no temperature, fan, or vent information is available. Backward chaining cannot fire any rule to establish a specific fault with insufficient facts.",
+      "provenance": "manually_authored_educational"
+    },
+    {
+      "id": "CASE-020",
+      "description": "Faulty power button preventing startup",
+      "category": "no_power",
+      "symptom_facts": ["no_power_sign", "power_button_faulty"],
+      "expected_conclusion": "fault_power_button",
+      "expected_status": "confirmed",
+      "applicable_rules": ["R02"],
+      "reasoning_explanation": "No power sign and the power button is physically identified as faulty. R02 fires directly with confirmed status.",
+      "provenance": "manually_authored_educational"
+    }
+  ]
+}

@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="page-home">
+
+  <!-- ── Hero ─────────────────────────────────────────────── -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero-content">
+      <div class="hero-badge">Hardware Fault Diagnosis &middot; Backward Chaining</div>
+      <h1 id="hero-heading" class="hero-title">
+        Computer Hardware<br>
+        <span class="hero-accent">Fault Diagnosis</span>
+      </h1>
+      <p class="hero-subtitle">
+        A rule-based expert system that diagnoses computer hardware faults using genuine
+        backward-chaining inference — asking only relevant questions and explaining
+        every conclusion with full <strong>WHY</strong> and <strong>HOW</strong> reasoning.
+      </p>
+      <div class="hero-actions">
+        <a href="{{ url_for('diagnosis_new') }}" class="btn btn-primary btn-lg" id="start-diagnosis-btn">
+          ⊕ Start Diagnosis
+        </a>
+        <a href="{{ url_for('history') }}" class="btn btn-secondary btn-lg" id="view-history-btn">
+          ☰ View History
+        </a>
+      </div>
+    </div>
+
+    <!-- CSS illustration — no external images -->
+    <div class="hero-visual" aria-hidden="true">
+      <div class="hw-illustration">
+        <div class="hw-chain">
+          <div class="hw-node hw-node-goal">Goal: No Power</div>
+          <div class="hw-arrow">↓</div>
+          <div class="hw-node hw-node-rules">Rules R01, R02, R03</div>
+          <div class="hw-arrow">↓</div>
+          <div class="hw-node hw-node-facts">Facts from User</div>
+          <div class="hw-arrow">↓</div>
+          <div class="hw-node hw-node-result">Diagnosis Found</div>
+        </div>
+        <div class="hw-label">Backward Chaining Inference</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Stats Bar ──────────────────────────────────────── -->
+  <div class="stats-bar" role="list" aria-label="System statistics">
+    <div class="stat-item" role="listitem">
+      <div class="stat-value">{{ stats.rules }}</div>
+      <div class="stat-label">IF-THEN Rules</div>
+    </div>
+    <div class="stat-item" role="listitem">
+      <div class="stat-value">{{ stats.questions }}</div>
+      <div class="stat-label">Questions</div>
+    </div>
+    <div class="stat-item" role="listitem">
+      <div class="stat-value">{{ stats.goals }}</div>
+      <div class="stat-label">Diagnostic Goals</div>
+    </div>
+    <div class="stat-item" role="listitem">
+      <div class="stat-value">{{ stats.dataset_cases }}</div>
+      <div class="stat-label">Dataset Cases</div>
+    </div>
+    <div class="stat-item" role="listitem">
+      <div class="stat-value">Local</div>
+      <div class="stat-label">No Cloud / No AI</div>
+    </div>
+  </div>
+
+  <!-- ── How It Works ───────────────────────────────────── -->
+  <section class="section" aria-labelledby="how-heading">
+    <h2 id="how-heading" class="section-title">How It Works</h2>
+    <p class="section-subtitle">Three simple steps to a reasoned hardware diagnosis</p>
+    <div class="steps-grid">
+      <div class="step-card" id="step-1">
+        <div class="step-number">1</div>
+        <div class="step-icon-wrap" aria-hidden="true">🎯</div>
+        <h3 class="step-title">Select Problem</h3>
+        <p class="step-desc">
+          Choose the hardware issue category. The engine focuses its backward-chaining
+          search on the relevant rules and goals.
+        </p>
+      </div>
+      <div class="step-card" id="step-2">
+        <div class="step-number">2</div>
+        <div class="step-icon-wrap" aria-hidden="true">❓</div>
+        <h3 class="step-title">Answer Questions</h3>
+        <p class="step-desc">
+          The engine asks only the questions it needs — <strong>Yes, No, or Unknown</strong>.
+          Each question is explained on demand. Unknown evidence is never treated as No.
+        </p>
+      </div>
+      <div class="step-card" id="step-3">
+        <div class="step-number">3</div>
+        <div class="step-icon-wrap" aria-hidden="true">📋</div>
+        <h3 class="step-title">View Diagnosis</h3>
+        <p class="step-desc">
+          See the result with full WHY and HOW explanations, the rules that fired,
+          and safe next steps. Every session is saved to history.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Diagnostic Categories ──────────────────────────── -->
+  <section class="section" aria-labelledby="categories-heading">
+    <h2 id="categories-heading" class="section-title">Diagnostic Categories</h2>
+    <p class="section-subtitle">Five supported hardware fault categories</p>
+    <div class="goals-grid">
+      {% set chips = ['chip-blue', 'chip-mint', 'chip-lavender', 'chip-orange', 'chip-teal'] %}
+      {% for goal in goals %}
+      <a href="{{ url_for('diagnosis_new') }}" class="goal-card" id="goal-home-{{ loop.index }}">
+        <div class="goal-icon-chip {{ chips[loop.index0 % chips|length] }}" aria-hidden="true">
+          {{ goal.icon }}
+        </div>
+        <div class="goal-title">{{ goal.label }}</div>
+        <div class="goal-desc">{{ goal.description }}</div>
+        <span class="goal-cta">Start diagnosis →</span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- ── Backward Chaining Explained ───────────────────── -->
+  <section class="section" aria-labelledby="bc-heading">
+    <h2 id="bc-heading" class="section-title">How Backward Chaining Works</h2>
+    <div class="bc-explain">
+      <div class="bc-text">
+        <p>
+          <strong>Backward chaining</strong> is a reasoning strategy used in rule-based
+          expert systems. Instead of applying all available rules forward, the engine
+          starts from a <em>goal</em> — the fault it wants to prove — and works backward
+          to find the facts that would support that conclusion.
+        </p>
+        <p>
+          The engine selects rules whose <strong>THEN</strong> part matches the current
+          goal. For each such rule, it recursively tries to prove every <strong>IF</strong>
+          premise. If a premise cannot be derived from other rules, it asks the user.
+        </p>
+        <p>
+          Questions stop the moment a conclusion is proven, disproven, or no more
+          useful questions remain. The engine handles multiple alternative rules and
+          detects cyclic dependencies so it never loops infinitely.
+        </p>
+        <p>
+          Every answer is recorded in <em>working memory</em>. The final conclusion
+          references the exact rules and facts that produced it — available as a HOW
+          explanation after each diagnosis.
+        </p>
+      </div>
+      <div class="bc-diagram" aria-hidden="true">
+        <div class="bc-step">
+          <span class="bc-label">Goal</span>
+          <span class="bc-code">fault_no_power</span>
+        </div>
+        <div class="bc-connector">↓ matches rules</div>
+        <div class="bc-step">
+          <span class="bc-label">Rule R01</span>
+          <span class="bc-code">IF power_cable_disconnected THEN fault...</span>
+        </div>
+        <div class="bc-connector">↓ premise unknown → ask user</div>
+        <div class="bc-step">
+          <span class="bc-label">Question Q02</span>
+          <span class="bc-code">Is the power cable plugged in?</span>
+        </div>
+        <div class="bc-connector">↓ Answer: No</div>
+        <div class="bc-step bc-step-result">
+          <span class="bc-label">Conclusion</span>
+          <span class="bc-code">Power cable disconnected ✓</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

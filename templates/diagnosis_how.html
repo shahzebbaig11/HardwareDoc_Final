@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}HOW — Inference Explanation{% endblock %}
+
+{% block content %}
+<div class="page-inner page-narrow">
+  <div class="page-header">
+    <h1 class="page-title">HOW the Diagnosis Was Reached</h1>
+    <p class="page-subtitle">
+      A step-by-step trace of the backward-chaining inference engine's reasoning process.
+    </p>
+  </div>
+
+  <!-- Summary -->
+  <div class="how-summary result-{{ explanation.conclusion.confidence }}">
+    <div class="how-goal">
+      <strong>Goal:</strong> {{ explanation.goal.label }}
+    </div>
+    <div class="how-conclusion">
+      <strong>Conclusion:</strong>
+      <span class="result-status-badge result-badge-inline result-{{ explanation.conclusion.confidence }}">
+        {{ explanation.conclusion.status_label }}
+      </span>
+      {{ explanation.conclusion.label }}
+    </div>
+    {% if explanation.conclusion.description %}
+    <p class="how-conclusion-desc">{{ explanation.conclusion.description }}</p>
+    {% endif %}
+  </div>
+
+  <!-- Proof Steps -->
+  <div class="how-section">
+    <h2 class="how-section-title">Inference Steps</h2>
+    <div class="proof-steps" role="list">
+      {% for step in explanation.proof_steps %}
+      <div class="proof-step proof-step-{{ step.type }}" role="listitem" id="proof-step-{{ step.step }}">
+        <div class="proof-step-number">{{ step.step }}</div>
+        <div class="proof-step-content">
+          {% if step.type == 'goal' %}
+            <div class="proof-step-label">🎯 Diagnostic Goal</div>
+            <div class="proof-step-desc">{{ step.description }}</div>
+
+          {% elif step.type == 'rule_fired' %}
+            <div class="proof-step-label">
+              ✅ Rule Fired: <span class="rule-id-badge">{{ step.rule_id }}</span>
+            </div>
+            <div class="proof-step-desc">{{ step.rule_description }}</div>
+            {% if step.premises %}
+            <div class="proof-premises">
+              <strong>Premises checked:</strong>
+              <ul class="proof-premises-list">
+                {% for p in step.premises %}
+                <li>
+                  <span class="answer-{{ p.value }}">
+                    {% if p.value == 'true' %}✓{% elif p.value == 'false' %}✗{% else %}?{% endif %}
+                  </span>
+                  <span class="premise-text">{{ p.text }}</span>
+                  <span class="premise-fact-id">({{ p.fact_id }})</span>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+            <div class="proof-conclusion">
+              → Established: <strong>{{ step.conclusion_label }}</strong>
+            </div>
+
+          {% elif step.type == 'rule_failed' %}
+            <div class="proof-step-label">
+              ✗ Rule Not Applicable: <span class="rule-id-badge rule-id-failed">{{ step.rule_id }}</span>
+            </div>
+            <div class="proof-step-desc">{{ step.description }}</div>
+
+          {% elif step.type == 'conclusion' %}
+            <div class="proof-step-label">🏁 Final Conclusion</div>
+            <div class="proof-step-desc">{{ step.description }}</div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Supporting facts -->
+  {% if explanation.supporting_facts %}
+  <div class="how-section">
+    <h2 class="how-section-title">Facts Used in Reasoning</h2>
+    <div class="facts-table">
+      {% for fact in explanation.supporting_facts %}
+      <div class="fact-row {% if fact.is_supporting %}fact-supporting{% endif %}">
+        <div class="fact-question">
+          {% if fact.is_supporting %}<span class="supporting-badge" title="Used in fired rule">★</span>{% endif %}
+          {{ fact.question }}
+        </div>
+        <span class="fact-answer answer-{{ fact.answer }}">
+          {% if fact.answer == 'yes' %}✓ Yes
+          {% elif fact.answer == 'no' %}✗ No
+          {% else %}? Unknown{% endif %}
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+    <p class="facts-legend"><span class="supporting-badge">★</span> = Used as a premise in a fired rule</p>
+  </div>
+  {% endif %}
+
+  <!-- Rules used -->
+  {% if explanation.rules_used %}
+  <div class="how-section">
+    <h2 class="how-section-title">Rules That Fired</h2>
+    <div class="rules-list">
+      {% for rule in explanation.rules_used %}
+      <div class="rule-item">
+        <span class="rule-id-badge">{{ rule.id }}</span>
+        <span class="rule-desc">{{ rule.description }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Next steps from HOW -->
+  {% if explanation.next_steps %}
+  <div class="how-section">
+    <h2 class="how-section-title">Recommended Next Steps</h2>
+    <ol class="next-steps-list">
+      {% for step in explanation.next_steps %}
+      <li>{{ step }}</li>
+      {% endfor %}
+    </ol>
+  </div>
+  {% endif %}
+
+  {% if explanation.safety_note %}
+  <div class="safety-note" role="note">
+    <span class="safety-icon" aria-hidden="true">⚠</span>
+    <div><strong>Safety Notice:</strong> {{ explanation.safety_note }}</div>
+  </div>
+  {% endif %}
+
+  <div class="result-actions">
+    <a href="{{ url_for('diagnosis_result') }}" class="btn btn-secondary" id="back-to-result-btn">← Back to Result</a>
+    <a href="{{ url_for('diagnosis_new') }}" class="btn btn-primary" id="new-diag-how-btn">➕ New Diagnosis</a>
+    <button onclick="window.print()" class="btn btn-ghost" id="print-how-btn">🖨 Print</button>
+  </div>
+
+</div>
+{% endblock %}

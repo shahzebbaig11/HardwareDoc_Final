@@ -1,0 +1,511 @@
+{
+  "rules": [
+    {
+      "id": "R01",
+      "description": "If there is no power sign and the power cable is disconnected, then the computer does not power on due to disconnected power cable.",
+      "premises": [
+        "no_power_sign",
+        "power_cable_disconnected"
+      ],
+      "conclusion": "fault_power_cable_disconnected",
+      "category": "no_power",
+      "confidence": "confirmed"
+    },
+    {
+      "id": "R02",
+      "description": "If there is no power sign and the power button is faulty, then the computer does not power on due to a faulty power button.",
+      "premises": [
+        "no_power_sign",
+        "power_button_faulty"
+      ],
+      "conclusion": "fault_power_button",
+      "category": "no_power",
+      "confidence": "confirmed"
+    },
+    {
+      "id": "R03",
+      "description": "If there is no power sign, the power cable is connected, and the PSU fan does not spin, then the PSU is suspected faulty.",
+      "premises": [
+        "no_power_sign",
+        "power_cable_connected",
+        "psu_fan_not_spinning"
+      ],
+      "conclusion": "fault_psu_suspected",
+      "category": "no_power",
+      "confidence": "suspected"
+    },
+    {
+      "id": "R04",
+      "description": "If there is no power sign, the power cable is connected, the PSU fan spins but the motherboard standby light is off, then the motherboard or PSU may have a fault.",
+      "premises": [
+        "no_power_sign",
+        "power_cable_connected",
+        "psu_fan_spinning",
+        "motherboard_standby_light_off"
+      ],
+      "conclusion": "fault_motherboard_or_psu",
+      "category": "no_power",
+      "confidence": "suspected"
+    },
+    {
+      "id": "R05",
+      "description": "If the computer powers on but the monitor shows no display and the monitor is off, then the fault is the monitor being off.",
+      "premises": [
+        "computer_powers_on",
+        "no_display_on_monitor",
+        "monitor_powered_off"
+      ],
+      "conclusion": "fault_monitor_off",
+      "category": "no_display",
+      "confidence": "confirmed"
+    },
+    {
+      "id": "R06",
+      "description": "If the computer powers on but shows no display, the monitor is on, and the display cable is disconnected, then the fault is a disconnected display cable.",
+      "premises": [
+        "computer_powers_on",
+        "no_display_on_monitor",
+        "monitor_powered_on",
+        "display_cable_disconnected"
+      ],
+      "conclusion": "fault_display_cable_disconnected",
+      "category": "no_display",
+      "confidence": "confirmed"
+    },
+    {
+      "id": "R07",
+      "description": "If the computer powers on, shows no display, the monitor and cable are fine, and there are GPU beep codes, then a GPU fault is suspected.",
+      "premises": [
+        "computer_powers_on",
+        "no_display_on_monitor",
+        "monitor_powered_on",
+        "display_cable_connected",
+        "gpu_beep_codes"
+      ],
+      "conclusion": "fault_gpu_suspected",
+      "category": "no_display",
+      "confidence": "suspected"
+    },
+    {
+      "id": "R08",
+      "description": "If the computer powers on, shows no display, monitor and cable are fine, no GPU beep codes, and the RAM is not seated correctly, then a RAM seating issue causes no display.",
+      "premises": [
+        "computer_powers_on",
+        "no_display_on_monitor",
+        "monitor_powered_on",
+        "display_cable_connected",
+        "no_gpu_beep_codes",
+        "ram_not_seated"
+      ],
+      "conclusion": "fault_ram_seating_no_display",
+      "category": "no_display",
+      "confidence": "suspected"
+    },
+    {
+      "id": "R09",
+      "description": "If the system beeps on startup with a RAM-related beep code pattern and RAM is not seated correctly, then RAM is confirmed faulty or unseated.",
+      "premises": [
+        "beep_on_startup",
+        "ram_beep_code",
+        "ram_not_seated"
+      ],
+      "conclusion": "fault_ram_unseated",
+      "category": "ram_failure",
+      "confidence": "confirmed"
+    },
+    {
+      "id": "R10",
+      "description": "If the system beeps on startup with a RAM-related beep code, RAM appears seated, but the system still fails, then RAM module is suspected faulty.",
+      "premises": [
+        "beep_on_startup",
+        "ram_beep_code",
+        "ram_seated"
+      ],
+      "conclusion": "fault_ram_module_suspected",
+      "category": "ram_failure",
+      "confidence": "suspected"
+    },
+    {
+      "id": "R11",
+      "description": "If there are no beep codes but the system fails to boot with RAM-related errors on screen, then RAM compatibility or failure is suspected.",
+      "premises": [
+        "no_beep_on_startup",
+        "ram_error_on_screen"
+      ],
+      "conclusion": "fault_ram_compatibility",
+      "category": "ram_failure",
+      "confidence": "suspected"
+    },
+    {
+      "id": "R12",
+      "description": "If the system shuts down unexpectedly and the CPU temperature is reported as high, then overheating is the likely cause.",
+      "premises": [
+        "unexpected_shutdown",
+        "cpu_temperature_high"
+      ],
+      "conclusion": "fault_overheating_cpu",
+      "category": "overheating",
+      "confidence": "suspected"
+    },
+    {
+      "id": "R13",
+      "description": "If the system shuts down unexpectedly, the CPU temperature is high, and the CPU fan is not spinning, then the CPU cooler fan is faulty.",
+      "premises": [
+        "unexpected_shutdown",
+        "cpu_temperature_high",
+        "cpu_fan_not_spinning"
+      ],
+      "conclusion": "fault_cpu_fan",
+      "category": "overheating",
+      "confidence": "confirmed"
+    },
+    {
+      "id": "R14",
+      "description": "If the system shuts down unexpectedly, the CPU temperature is high, the fan is spinning but thermal paste is dried out, then thermal paste replacement is required.",
+      "premises": [
+        "unexpected_shutdown",
+        "cpu_temperature_high",
+        "cpu_fan_spinning",
+        "thermal_paste_dried"
+      ],
+      "conclusion": "fault_thermal_paste",
+      "category": "overheating",
+      "confidence": "suspected"
+    },
+    {
+      "id": "R15",
+      "description": "If the system shuts down unexpectedly and case vents are blocked, then poor airflow is causing overheating.",
+      "premises": [
+        "unexpected_shutdown",
+        "case_vents_blocked"
+      ],
+      "conclusion": "fault_poor_airflow",
+      "category": "overheating",
+      "confidence": "suspected"
+    },
+    {
+      "id": "R16",
+      "description": "If the storage drive is not detected in BIOS and the data cable is disconnected, then the storage drive is not detected due to a disconnected cable.",
+      "premises": [
+        "drive_not_detected_in_bios",
+        "storage_data_cable_disconnected"
+      ],
+      "conclusion": "fault_storage_cable",
+      "category": "storage_failure",
+      "confidence": "confirmed"
+    },
+    {
+      "id": "R17",
+      "description": "If the storage drive is not detected in BIOS and the cable is connected but the drive makes clicking sounds, then the storage drive is likely mechanically failed.",
+      "premises": [
+        "drive_not_detected_in_bios",
+        "storage_data_cable_connected",
+        "drive_clicking_sound"
+      ],
+      "conclusion": "fault_storage_mechanical",
+      "category": "storage_failure",
+      "confidence": "suspected"
+    },
+    {
+      "id": "R18",
+      "description": "If the system displays a boot error and the drive is detected but the OS is missing or corrupted, then the boot failure is due to corrupted OS or MBR.",
+      "premises": [
+        "boot_error_on_screen",
+        "drive_detected_in_bios",
+        "os_missing_or_corrupted"
+      ],
+      "conclusion": "fault_os_boot",
+      "category": "storage_failure",
+      "confidence": "suspected"
+    },
+    {
+      "id": "R19",
+      "description": "If the drive is not detected and the cable is connected, no clicking sound, then the drive may have failed electronically.",
+      "premises": [
+        "drive_not_detected_in_bios",
+        "storage_data_cable_connected",
+        "no_drive_clicking_sound"
+      ],
+      "conclusion": "fault_storage_electronic",
+      "category": "storage_failure",
+      "confidence": "suspected"
+    },
+    {
+      "id": "R20",
+      "description": "If there is no power sign and neither the power cable nor power button are identified as faulty, insufficient evidence for specific diagnosis.",
+      "premises": [
+        "no_power_sign",
+        "power_cable_connected",
+        "psu_fan_spinning",
+        "motherboard_standby_light_on"
+      ],
+      "conclusion": "fault_no_power_unknown",
+      "category": "no_power",
+      "confidence": "insufficient_evidence"
+    },
+    {
+      "id": "R21",
+      "description": "If the computer powers on and POST beep codes are heard and there is no video, then a POST failure has occurred — likely RAM or motherboard.",
+      "premises": [
+        "computer_powers_on",
+        "post_beep_code_heard",
+        "post_no_video_no_beep"
+      ],
+      "conclusion": "fault_post_failure",
+      "category": "bios_post",
+      "confidence": "suspected"
+    },
+    {
+      "id": "R22",
+      "description": "If the computer powers on, there are no POST beep codes, and the screen stays blank with no BIOS screen, this indicates a silent POST failure.",
+      "premises": [
+        "computer_powers_on",
+        "no_post_beep_code",
+        "post_no_video_no_beep"
+      ],
+      "conclusion": "fault_post_failure",
+      "category": "bios_post",
+      "confidence": "suspected"
+    },
+    {
+      "id": "R23",
+      "description": "If the BIOS date resets to a default old date every boot, the CMOS battery is flat.",
+      "premises": [
+        "computer_powers_on",
+        "bios_date_reset_on_boot"
+      ],
+      "conclusion": "fault_cmos_battery",
+      "category": "bios_post",
+      "confidence": "confirmed"
+    }
+  ],
+  "fault_descriptions": {
+    "fault_power_cable_disconnected": {
+      "label": "Disconnected Power Cable",
+      "description": "The computer's main power cable is not connected to the power supply or wall outlet.",
+      "next_steps": [
+        "Ensure the power cable is securely connected to the PSU and the wall outlet.",
+        "Try a different wall outlet or power strip.",
+        "If possible, try a different power cable."
+      ],
+      "safety_note": "Always power off the computer completely before reconnecting cables."
+    },
+    "fault_power_button": {
+      "label": "Faulty Power Button",
+      "description": "The front panel power button may be stuck, broken, or disconnected from the motherboard header.",
+      "next_steps": [
+        "Check if the power button feels stuck or does not click properly.",
+        "Check the motherboard front panel connector pins.",
+        "Consult a qualified technician to inspect or replace the power button."
+      ],
+      "safety_note": "Do not attempt to bypass the power button yourself unless you are qualified."
+    },
+    "fault_psu_suspected": {
+      "label": "Suspected Power Supply Unit (PSU) Failure",
+      "description": "The PSU fan is not spinning when power is applied, suggesting the PSU may have failed.",
+      "next_steps": [
+        "Have the PSU tested by a qualified technician.",
+        "If confirmed faulty, replace the PSU with a compatible unit.",
+        "Do not open or attempt to repair a PSU yourself — it contains dangerously high voltages even when unplugged."
+      ],
+      "safety_note": "Never open a power supply unit. It contains capacitors that hold lethal voltages even after being unplugged."
+    },
+    "fault_motherboard_or_psu": {
+      "label": "Suspected Motherboard or PSU Issue",
+      "description": "The PSU fan spins but the motherboard standby light is off, indicating the motherboard may not be receiving power or may be faulty.",
+      "next_steps": [
+        "Check all motherboard power connectors (24-pin ATX and 8-pin CPU).",
+        "Have a qualified technician test with a known-good PSU.",
+        "Inspect the motherboard for visible damage such as burnt components."
+      ],
+      "safety_note": "Always power off and unplug before inspecting internal components. Seek professional help for motherboard diagnosis."
+    },
+    "fault_monitor_off": {
+      "label": "Monitor Not Powered On",
+      "description": "The monitor is not switched on, which is why no display is shown.",
+      "next_steps": [
+        "Press the monitor's power button.",
+        "Check the monitor's power cable connection.",
+        "Verify the monitor is getting power (look for the standby LED)."
+      ],
+      "safety_note": "Standard monitor operation. No safety risk."
+    },
+    "fault_display_cable_disconnected": {
+      "label": "Disconnected Display Cable",
+      "description": "The cable connecting the computer to the monitor (HDMI, VGA, or DisplayPort) is not securely connected.",
+      "next_steps": [
+        "Reconnect the display cable securely to both the computer and monitor.",
+        "Ensure the cable is connected to the correct port (GPU output, not motherboard if a discrete GPU is installed).",
+        "Try a different cable if available."
+      ],
+      "safety_note": "Display cables can be reconnected without powering down in most cases. However, do so carefully."
+    },
+    "fault_gpu_suspected": {
+      "label": "Suspected GPU (Graphics Card) Failure",
+      "description": "Beep codes during startup suggest the GPU may be faulty or not seated properly.",
+      "next_steps": [
+        "If the GPU is discrete, try reseating it in the PCIe slot.",
+        "Try using the motherboard's integrated graphics output (if available).",
+        "Have the GPU tested by a qualified technician.",
+        "Replace the GPU if confirmed faulty."
+      ],
+      "safety_note": "Power off and unplug the computer before reseating any internal components."
+    },
+    "fault_ram_seating_no_display": {
+      "label": "RAM Seating Issue Causing No Display",
+      "description": "RAM modules are not correctly seated in their slots, preventing the system from passing POST and displaying anything.",
+      "next_steps": [
+        "Power off and unplug the computer.",
+        "Remove the RAM modules and reinsert them firmly until the clips click.",
+        "Try booting with a single RAM stick in slot 1.",
+        "Check the motherboard manual for correct RAM slot configuration."
+      ],
+      "safety_note": "Always power off and disconnect power before touching internal components. Handle RAM by its edges."
+    },
+    "fault_ram_unseated": {
+      "label": "RAM Not Properly Seated",
+      "description": "The RAM module is not correctly inserted, causing startup beep codes and boot failure.",
+      "next_steps": [
+        "Power off and unplug the computer.",
+        "Remove the RAM and reinsert it firmly until the locking clips engage.",
+        "Confirm the RAM is in the correct slot according to the motherboard manual.",
+        "Try with one stick at a time if multiple sticks are installed."
+      ],
+      "safety_note": "Always power off and unplug before handling RAM. Ground yourself to avoid static discharge."
+    },
+    "fault_ram_module_suspected": {
+      "label": "Suspected RAM Module Failure",
+      "description": "RAM beep codes are present and RAM appears seated, suggesting the RAM module itself may be faulty.",
+      "next_steps": [
+        "Try a different RAM module if available.",
+        "Run a memory diagnostic tool such as Windows Memory Diagnostic.",
+        "Consult a qualified technician if the problem persists."
+      ],
+      "safety_note": "Power off before replacing RAM modules."
+    },
+    "fault_ram_compatibility": {
+      "label": "Suspected RAM Compatibility or Failure",
+      "description": "RAM errors appear on screen without beep codes, suggesting a RAM compatibility or configuration issue.",
+      "next_steps": [
+        "Check that the RAM speed and type (DDR4, DDR5) matches what the motherboard supports.",
+        "Check the motherboard's QVL (Qualified Vendor List) for compatible RAM.",
+        "Run Windows Memory Diagnostic to test the RAM."
+      ],
+      "safety_note": "Check the motherboard manual before purchasing replacement RAM."
+    },
+    "fault_overheating_cpu": {
+      "label": "Suspected CPU Overheating",
+      "description": "The CPU is running at high temperatures, causing unexpected system shutdowns as a self-protection mechanism.",
+      "next_steps": [
+        "Check that the CPU cooler is properly mounted.",
+        "Ensure case fans are working and airflow is not blocked.",
+        "Monitor CPU temperatures using a utility such as HWMonitor.",
+        "Consider replacing thermal paste or upgrading the cooler."
+      ],
+      "safety_note": "Do not operate the computer without proper cooling. Sustained overheating can permanently damage the CPU."
+    },
+    "fault_cpu_fan": {
+      "label": "CPU Cooler Fan Not Spinning",
+      "description": "The CPU fan is not spinning, leading to rapid overheating and automatic shutdown.",
+      "next_steps": [
+        "Check that the CPU fan is connected to the CPU_FAN header on the motherboard.",
+        "Inspect for physical damage or blockage.",
+        "Replace the CPU fan or cooler if it is faulty."
+      ],
+      "safety_note": "Never run a computer without a functioning CPU cooler. This can permanently damage the processor within minutes."
+    },
+    "fault_thermal_paste": {
+      "label": "Dried or Inadequate Thermal Paste",
+      "description": "Thermal paste between the CPU and cooler has dried out, reducing heat transfer efficiency and causing overheating.",
+      "next_steps": [
+        "Have a qualified technician remove the cooler, clean off the old thermal paste, and apply a fresh application.",
+        "Use a quality thermal compound."
+      ],
+      "safety_note": "Removing a CPU cooler requires care to avoid damaging the CPU or motherboard. Seek professional help if unsure."
+    },
+    "fault_poor_airflow": {
+      "label": "Poor Case Airflow",
+      "description": "Blocked vents or insufficient case fans are preventing adequate airflow, leading to thermal shutdowns.",
+      "next_steps": [
+        "Remove any obstructions from intake and exhaust vents.",
+        "Ensure the computer is not placed in an enclosed space.",
+        "Consider adding case fans or improving cable management."
+      ],
+      "safety_note": "Do not operate the computer in an enclosed space without adequate ventilation."
+    },
+    "fault_storage_cable": {
+      "label": "Disconnected Storage Data Cable",
+      "description": "The SATA or NVMe connection to the storage drive is not properly connected, preventing detection.",
+      "next_steps": [
+        "Power off and unplug the computer.",
+        "Reconnect the data cable between the storage drive and motherboard.",
+        "Also check the power cable to the drive.",
+        "Verify drive is detected in BIOS after reconnection."
+      ],
+      "safety_note": "Always power off before touching internal storage connections."
+    },
+    "fault_storage_mechanical": {
+      "label": "Suspected Mechanical Hard Drive Failure",
+      "description": "Clicking sounds from the drive and failure to detect suggest the hard drive has a mechanical failure.",
+      "next_steps": [
+        "Stop using the drive immediately to prevent further data loss.",
+        "Consult a professional data recovery service if data is important.",
+        "Replace the hard drive.",
+        "Consider switching to an SSD for better reliability."
+      ],
+      "safety_note": "Clicking hard drives can fail completely at any time. Back up data immediately if possible."
+    },
+    "fault_os_boot": {
+      "label": "Operating System Boot Failure",
+      "description": "The drive is detected but the OS or boot records are missing or corrupted, preventing Windows from starting.",
+      "next_steps": [
+        "Boot from a Windows installation USB and use Startup Repair.",
+        "Use command-line tools such as bootrec /fixmbr and bootrec /fixboot.",
+        "If repair fails, consider reinstalling the operating system.",
+        "Back up data first if you can access the drive from another system."
+      ],
+      "safety_note": "Reinstalling the OS will erase existing data unless data is backed up first."
+    },
+    "fault_storage_electronic": {
+      "label": "Suspected Electronic Storage Drive Failure",
+      "description": "The drive is not detected, the cable is connected, and there are no clicking sounds, suggesting an electronic failure on the drive's circuit board.",
+      "next_steps": [
+        "Try the drive in a different SATA port or as an external drive in another computer.",
+        "Have a qualified technician test the drive.",
+        "If the drive has failed, consult a data recovery specialist before discarding it."
+      ],
+      "safety_note": "Do not attempt to open a hard drive yourself — it will destroy any chance of data recovery."
+    },
+    "fault_no_power_unknown": {
+      "label": "Unable to Determine Specific Power Fault",
+      "description": "The system shows no power but available checks did not identify a specific cause. A comprehensive hardware inspection is needed.",
+      "next_steps": [
+        "Have the system inspected by a qualified technician.",
+        "Request testing of PSU, motherboard, and front panel connections."
+      ],
+      "safety_note": "Do not attempt internal repairs without proper training."
+    },
+    "fault_post_failure": {
+      "label": "POST (Power-On Self-Test) Failure",
+      "description": "The motherboard failed its startup self-test. This is typically caused by faulty or unseated RAM, a defective GPU, or a motherboard fault. The computer cannot progress past the very earliest stage of startup.",
+      "next_steps": [
+        "Power off and reseat all RAM modules — remove and firmly reinsert each stick.",
+        "If multiple RAM sticks are installed, try booting with only one at a time.",
+        "Remove any recently added hardware (extra GPU, expansion cards) and test.",
+        "If the problem persists, consult a qualified technician to test the motherboard and CPU."
+      ],
+      "safety_note": "Always power off and unplug the computer before reseating components. Handle RAM with care — do not touch the gold contacts."
+    },
+    "fault_cmos_battery": {
+      "label": "Flat CMOS Battery",
+      "description": "The CMOS coin cell battery on the motherboard is depleted. This battery maintains the system clock and BIOS settings when the computer is off. A flat battery causes the clock to reset to a default date on every boot.",
+      "next_steps": [
+        "Purchase a CR2032 coin cell battery (widely available and inexpensive).",
+        "Power off and unplug the computer.",
+        "Locate the coin cell battery on the motherboard and replace it.",
+        "After replacement, set the correct date and time in BIOS."
+      ],
+      "safety_note": "CMOS battery replacement is safe and straightforward, but always unplug the computer first and avoid touching other components unnecessarily."
+    }
+  }
+}

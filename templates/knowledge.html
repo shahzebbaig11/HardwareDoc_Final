@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+{% block title %}Knowledge Base & Dataset{% endblock %}
+
+{% block content %}
+<div class="page-inner">
+  <div class="page-header">
+    <h1 class="page-title">Knowledge Base & Dataset</h1>
+    <p class="page-subtitle">
+      The three components powering the diagnosis engine: IF-THEN rules, educational dataset cases,
+      and the question bank.
+    </p>
+  </div>
+
+  <!-- KB validation status -->
+  {% if validation_errors %}
+  <div class="alert alert-error" role="alert">
+    <strong>⚠ Knowledge Base Errors ({{ validation_errors | length }}):</strong>
+    <ul>{% for e in validation_errors %}<li>{{ e }}</li>{% endfor %}</ul>
+  </div>
+  {% else %}
+  <div class="alert alert-success" role="status">
+    <strong>✓ Knowledge Base Valid</strong> — {{ rules | length }} rules, {{ questions | length }} questions,
+    {{ total_cases }} dataset cases. No validation errors.
+  </div>
+  {% endif %}
+
+  {% if validation_warnings %}
+  <div class="alert alert-warning" role="note">
+    <strong>Warnings ({{ validation_warnings | length }}):</strong>
+    <ul>{% for w in validation_warnings %}<li>{{ w }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+
+  <!-- Tabs -->
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-dataset" id="tab-btn-dataset">
+      📊 Dataset Cases ({{ total_cases }})
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-rules" id="tab-btn-rules">
+      📏 Rules ({{ rules | length }})
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-questions" id="tab-btn-questions">
+      ❓ Questions ({{ questions | length }})
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-about-kb" id="tab-btn-about">
+      ℹ About
+    </button>
+  </div>
+
+  <!-- Dataset Panel -->
+  <div class="tab-panel active" id="tab-dataset" role="tabpanel" aria-labelledby="tab-btn-dataset">
+    <div class="kb-section-header">
+      <p class="kb-section-desc">{{ dataset_metadata.description }}</p>
+    </div>
+
+    <!-- Search and filter -->
+    <form class="kb-filters" method="GET" action="{{ url_for('knowledge') }}" id="dataset-filter-form">
+      <input type="text" name="search" value="{{ search }}" placeholder="Search cases…"
+             class="kb-search-input" id="dataset-search-input" aria-label="Search dataset cases" />
+      <select name="category" class="kb-filter-select" id="category-filter" aria-label="Filter by category">
+        <option value="">All Categories</option>
+        {% for cat in categories %}
+        <option value="{{ cat }}" {% if category_filter == cat %}selected{% endif %}>
+          {{ cat | replace('_', ' ') | title }}
+        </option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-secondary btn-sm" id="filter-btn">Filter</button>
+      {% if search or category_filter %}
+      <a href="{{ url_for('knowledge') }}" class="btn btn-ghost btn-sm" id="clear-filter-btn">Clear</a>
+      {% endif %}
+    </form>
+
+    <div class="dataset-count">
+      Showing {{ dataset_cases | length }} of {{ total_cases }} cases
+    </div>
+
+    {% if dataset_cases %}
+    <div class="dataset-grid">
+      {% for case in dataset_cases %}
+      <div class="dataset-card" id="case-{{ case.id }}">
+        <div class="dataset-card-header">
+          <span class="case-id-badge">{{ case.id }}</span>
+          <span class="case-category-badge">{{ case.category | replace('_', ' ') | title }}</span>
+          <span class="case-status-badge status-{{ case.expected_status }}">
+            {{ case.expected_status | replace('_', ' ') | title }}
+          </span>
+        </div>
+        <h3 class="dataset-case-title">{{ case.description }}</h3>
+        {% if case.expected_conclusion %}
+        <div class="dataset-case-conclusion">
+          <strong>Expected:</strong> {{ case.expected_conclusion | replace('_', ' ') | title }}
+        </div>
+        {% else %}
+        <div class="dataset-case-conclusion">
+          <strong>Expected:</strong> No specific conclusion (Insufficient Evidence)
+        </div>
+        {% endif %}
+        <div class="dataset-case-facts">
+          <strong>Symptom facts:</strong>
+          <div class="fact-tags">
+            {% for fact in case.symptom_facts %}
+            <span class="fact-tag">{{ fact }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        {% if case.applicable_rules %}
+        <div class="dataset-case-rules">
+          <strong>Rules:</strong>
+          {% for rule_id in case.applicable_rules %}
+          <span class="rule-id-badge">{{ rule_id }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+        <details class="case-reasoning-detail">
+          <summary>View Reasoning</summary>
+          <p class="case-reasoning-text">{{ case.reasoning_explanation }}</p>
+        </details>
+        <div class="case-provenance">
+          <small>Provenance: {{ case.provenance | replace('_', ' ') | title }}</small>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <p>No cases match your search. <a href="{{ url_for('knowledge') }}">Clear filters</a></p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Rules Panel -->
+  <div class="tab-panel" id="tab-rules" role="tabpanel" aria-labelledby="tab-btn-rules" hidden>
+    <div class="kb-section-header">
+      <p class="kb-section-desc">
+        These IF-THEN production rules form the knowledge base used by the backward-chaining engine.
+        Each rule has premises (conditions) and a conclusion (diagnosed fault).
+      </p>
+    </div>
+    <div class="rules-table-wrapper">
+      <table class="rules-table" aria-label="Knowledge base rules">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Category</th>
+            <th>Premises (IF)</th>
+            <th>Conclusion (THEN)</th>
+            <th>Confidence</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rule in rules %}
+          <tr id="rule-row-{{ rule.id }}">
+            <td><span class="rule-id-badge">{{ rule.id }}</span></td>
+            <td><span class="category-badge">{{ rule.category | replace('_', ' ') | title }}</span></td>
+            <td>
+              <div class="premises-list">
+                {% for p in rule.premises %}
+                <span class="premise-tag">{{ p }}</span>
+                {% endfor %}
+              </div>
+              <small class="rule-desc-small">{{ rule.description }}</small>
+            </td>
+            <td><code class="conclusion-code">{{ rule.conclusion }}</code></td>
+            <td><span class="confidence-badge confidence-{{ rule.confidence }}">{{ rule.confidence }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Questions Panel -->
+  <div class="tab-panel" id="tab-questions" role="tabpanel" aria-labelledby="tab-btn-questions" hidden>
+    <div class="kb-section-header">
+      <p class="kb-section-desc">
+        The question bank. Each question is linked to a specific fact ID. The backward-chaining
+        engine selects questions from this bank when it needs to determine the value of an unknown fact.
+      </p>
+    </div>
+    <div class="questions-list">
+      {% for q in questions %}
+      <div class="question-kb-card" id="q-kb-{{ q.id }}">
+        <div class="q-kb-header">
+          <span class="q-id-badge">{{ q.id }}</span>
+          <span class="q-fact-id"><code>{{ q.fact_id }}</code></span>
+        </div>
+        <p class="q-kb-text">{{ q.text }}</p>
+        <div class="q-kb-why">
+          <strong>Why explanation:</strong> {{ q.why_explanation }}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- About KB Panel -->
+  <div class="tab-panel" id="tab-about-kb" role="tabpanel" aria-labelledby="tab-btn-about" hidden>
+    <div class="about-kb-content">
+      <h2>Three Distinct Components</h2>
+      <div class="kb-component-grid">
+        <div class="kb-component-card">
+          <h3>📏 Knowledge Base (Rules)</h3>
+          <p>
+            A set of IF-THEN production rules authored by a domain expert. Each rule specifies
+            one or more premises (conditions) and a conclusion (a specific hardware fault). The
+            knowledge base represents expert knowledge about hardware diagnosis. It is stored in
+            <code>data/rules.json</code> and is separate from the dataset.
+          </p>
+        </div>
+        <div class="kb-component-card">
+          <h3>📊 Dataset (Educational Cases)</h3>
+          <p>
+            A structured set of educational diagnostic case records. Each case documents a
+            known set of symptom facts, the expected conclusion, and the reasoning pathway.
+            These cases are <em>manually authored educational examples</em>, not measured
+            real-world data. They are used to validate the knowledge base and to illustrate
+            expected reasoning paths. Stored in <code>data/hardware_diagnostic_dataset.json</code>.
+          </p>
+        </div>
+        <div class="kb-component-card">
+          <h3>🧠 Working Memory (Session State)</h3>
+          <p>
+            During a diagnosis session, the engine maintains a working memory of all facts
+            that have been established (True, False, or Unknown) from the user's answers.
+            Working memory is session-specific — it is created fresh for each diagnosis and
+            does not persist in the database. Only the results and inference summary are saved.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-selected', 'false');
+    });
+    document.querySelectorAll('.tab-panel').forEach(p => {
+      p.classList.remove('active');
+      p.hidden = true;
+    });
+    this.classList.add('active');
+    this.setAttribute('aria-selected', 'true');
+    const panel = document.getElementById(this.getAttribute('aria-controls'));
+    if (panel) {
+      panel.classList.add('active');
+      panel.hidden = false;
+    }
+  });
+});
+</script>
+{% endblock %}
